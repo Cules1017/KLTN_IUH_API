@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('client_job', function (Blueprint $table) {
+        Schema::create('rate', function (Blueprint $table) {
             $table->id();
             $table->integer('job_id');
-            $table->integer('client_id');
-            $table->integer('bids');
+            $table->integer('freelancer_id');
+            $table->integer('rate_value');
             $table->integer('status');
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('client_job');
+        Schema::dropIfExists('client');
     }
 };

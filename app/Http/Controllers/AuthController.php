@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Token;
 
 class AuthController extends Controller
 {
@@ -62,8 +64,8 @@ class AuthController extends Controller
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'email' => 'required|string|email|max:100|unique:admin',
+            'password' => 'required|string|min:6',
         ]);
 
         if($validator->fails()){
@@ -74,7 +76,21 @@ class AuthController extends Controller
                     $validator->validated(),
                     ['password' => bcrypt($request->password)]
                 ));
-
+        $requestEmail = $request->email;
+        $nameUser = $request->name;
+        $token=Auth::guard('admin')->attempt($validator->validated());
+        $customClaims = [
+            //'user_type' => $userType,
+            'user_info' =>[
+                'email'=>$requestEmail,
+                'name'=>$nameUser
+            ],
+            // Add any other additional claims you want to include
+        ];
+        $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard('admin')->user());
+        Mail::send('mailfb', array('name'=>'aaaa','email'=>$requestEmail,'token'=>$token, 'content'=>'aaa'), function($message)use ($requestEmail,$nameUser,$token){
+	        $message->to($requestEmail, $nameUser)->subject('Hi Mai ăn sáng hog bà!');
+	    });
         return response()->json([
             'message' => 'User successfully registered',
             'user' => $user
@@ -109,6 +125,20 @@ class AuthController extends Controller
      */
     public function userProfile() {
         return response()->json(auth()->user());
+    }
+
+    public function verifyCodeEmail(Request $request) {
+        $token = new Token($request->token);
+        //$token = JWTAuth::getTokenizer()->parse($request->token);
+
+        $apy = JWTAuth::decode($token);
+        $user=Admin::where('email',$apy['user_info']['email'])->first();
+        if($user){
+           // Update the existing user instance
+            $user->email_verified_at = now();
+            $user->save();
+        }
+     return  redirect('https://www.google.com/');
     }
 
     /**

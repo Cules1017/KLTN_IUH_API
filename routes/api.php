@@ -18,6 +18,8 @@ Route::group(['prefix' => env('APP_VERSION','v1'), 'namespace' => 'App\Http\Cont
         [],
         function () {
             Route::post('/login', 'AuthController@login')->name('login');
+            Route::post('/register', 'AuthController@register')->name('register');
+            Route::get('/verify', 'AuthController@VerifyCodeEmail')->name('VerifyCodeEmail');
         }
     );
     Route::group(
