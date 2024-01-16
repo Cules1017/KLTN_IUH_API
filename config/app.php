@@ -171,6 +171,7 @@ return [
         App\Providers\ServiceMappingProvider::class,
         App\Providers\RepositoryMappingProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -188,6 +189,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class
     ])->toArray(),
 
 ];
