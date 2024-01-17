@@ -31,9 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'google' => [
-        'client_id' => '653440115154-kqoqpdt95d8gnm9k9eu4erqci1uodu5d.apps.googleusercontent.com',
-        'client_secret' => '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',
-        'redirect' => 'http://localhost:8000/',
+        'client_id' => '653440115154-kr4n7kf4up3iebtsmic7ak4a3k7vlm7d.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'http://localhost:8000/api/v1/google-callback',
     ],
 
 ];

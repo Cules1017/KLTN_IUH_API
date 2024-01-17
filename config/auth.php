@@ -56,6 +56,11 @@ return [
             'provider' => 'client',
             'hash' => false,
         ],
+        'freelancer' => [
+            'driver' => 'jwt',
+            'provider' => 'freelancer',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -83,6 +88,10 @@ return [
         'client' => [
             'driver' => 'eloquent',
             'model' => App\Models\Client::class,
+        ],
+        'freelancer' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Freelancer::class,
         ],
 
         // 'users' => [
@@ -129,6 +138,11 @@ return [
     | confirmation screen. By default, the timeout lasts for three hours.
     |
     */
+    'socialite' => [
+        'drivers' => [
+            'google',
+        ],
+    ],
 
     'password_timeout' => 10800,
 

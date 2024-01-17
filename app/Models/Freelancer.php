@@ -22,6 +22,8 @@ class Freelancer extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'google_id',
+        'email_verified_at'
     ];
     protected $guard =[] ;
 

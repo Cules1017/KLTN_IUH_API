@@ -24,8 +24,9 @@ class CheckToken
     public function handle(Request $request, Closure $next)
     { 
         //decode token
-        // $token = JWTAuth::getToken();
-        // $apy = JWTAuth::getPayload($token)->toArray();
+        $token = JWTAuth::getToken();
+        $apy = JWTAuth::getPayload($token)->toArray();
+        dd($apy,strtotime(now()));
         
         try {
           

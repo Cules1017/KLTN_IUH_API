@@ -15,11 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['prefix' => env('APP_VERSION','v1'), 'namespace' => 'App\Http\Controllers'], function () {
     Route::group(
-        [],
+        ['middleware' => ['api']],
         function () {
             Route::post('/login', 'AuthController@login')->name('login');
             Route::post('/register', 'AuthController@register')->name('register');
             Route::get('/verify', 'AuthController@VerifyCodeEmail')->name('VerifyCodeEmail');
+            Route::get('/login-with-google', 'AuthController@redirectToGoogle')->name('LoginWithGoogle')->where('driver', implode('|', config('auth.socialite.drivers')));
+            Route::get('/google-callback', 'AuthController@handleGoogleCallback');
         }
     );
     Route::group(

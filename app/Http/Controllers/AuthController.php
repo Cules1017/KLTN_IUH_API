@@ -22,7 +22,7 @@ class AuthController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        //$this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -55,7 +55,13 @@ class AuthController extends Controller
         ];
         $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard($userType)->user());
 
-        return $this->createNewToken($token);
+        return $this->createNewToken($token,$userType,auth($userType)->user());
+    }
+    public function redirectToGoogle(Request $request)
+    {
+        
+        return Socialite::driver('google')->redirect();
+
     }
 
     /**
@@ -150,12 +156,12 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token,$typeUser='admin'){
+    protected function createNewToken($token,$typeUser='admin',$userInfo=null){
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth($typeUser)->factory()->getTTL() * 60,
-            'user' => auth()->user(),
+            'user' => $userInfo,
         ]);
     }
 
@@ -179,40 +185,54 @@ class AuthController extends Controller
             'user' => $user,
         ], 201);
     }
-    public function redirectToGoogle()
-    {
-
-        return Socialite::driver('google')->redirect();
-
-    }
+    
     public function handleGoogleCallback()
 
     {
-
         try {
 
-            $user = Socialite::driver('google')->user();
+            $user =Socialite::driver('google')->stateless()->user();
             $finduser = Freelancer::where('google_id', $user->id)->first();
+            $userExist = Freelancer::where('email', $user->email)->first();
+            
             if($finduser){
-                Auth::login($finduser);
-                return redirect('/home');
-
+                $customClaims = [
+                    'user_type' =>'freelancer',
+                    'user_info' =>$finduser,
+                    // Add any other additional claims you want to include
+                ];
+                $token = JWTAuth::customClaims($customClaims)->fromUser($finduser);
+                auth('freelancer')->factory()->getTTL() * 60;
+                return redirect(env('FRONTEND_URL').'auth/google?token='.$token);
             }else{
-
+                if($userExist){
+                    return response()->json([
+                        'message' => 'Email account has been registered on the system. Please use another email.'
+                    ], 400);
+                }
                 $newUser = Freelancer::create([
                     'name' => $user->name,
                     'email' => $user->email,
+                    'password' =>bcrypt('password'),
+                    'email_verified_at'=>now(),
                     'google_id'=> $user->id
 
                 ]);
 
-                Auth::login($newUser);
+                $customClaims = [
+                    'user_type' =>'freelancer',
+                    'user_info' =>$newUser ,
+                    // Add any other additional claims you want to include
+                ];
+                $token = JWTAuth::customClaims($customClaims)->fromUser($newUser);
+                auth('freelancer')->factory()->getTTL() * 60;
+                //return $this->createNewToken($token);
 
-                return redirect()->back();
+                return redirect(env('FRONTEND_URL').'auth/google?token='.$token);
 
             }
         } catch (\Exception $e) {
-            return redirect('auth/google');
+            return redirect(env('FRONTEND_URL').'login');
 
         }
 
