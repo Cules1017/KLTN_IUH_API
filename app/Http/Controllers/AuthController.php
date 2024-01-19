@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Client;
 use App\Models\Freelancer;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
@@ -32,12 +34,13 @@ class AuthController extends Controller
      */
     public function login(Request $request){
     	$validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'username' => 'required_without:email|string',
+            'email' => 'required_without:username|string|email',
             'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return $this->sendFailedResponse($validator->errors(),-1,null,422);
         }
         $userType=null;
         if(Auth::guard('admin')->attempt($validator->validated()))
@@ -46,13 +49,16 @@ class AuthController extends Controller
             $userType='client';
         //dd(Auth::guard('client')->attempt($validator->validated()),Auth::guard('admin')->attempt($validator->validated()),!(Auth::guard('client')->attempt($validator->validated())&&Auth::guard('admin')->attempt($validator->validated())));
         if ($userType==null) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return $this->sendFailedResponse('Unauthorized',-1,null,401);
         }
         $customClaims = [
             'user_type' => $userType,
             'user_info' =>auth($userType)->user() ,
             // Add any other additional claims you want to include
         ];
+        if(Auth::guard($userType)->user()->email_verified_at==null) {
+            return $this->sendFailedResponse('Vui lòng xác thực email trước khi login.',-1,null,401);
+        }
         $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard($userType)->user());
 
         return $this->createNewToken($token,$userType,auth($userType)->user());
@@ -71,38 +77,80 @@ class AuthController extends Controller
      */
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
+            'username' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:admin',
             'password' => 'required|string|min:6',
+            'type_user' => 'required|string|in:freelancer,admin,client'
         ]);
-
         if($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
+            return $this->sendFailedResponse($validator->errors()->toJson());
         }
+        $validatedData = collect($validator->validated())->except('type_user')->all();
+        if($request->type_user=='admin'){
+            if(!isset($request->serect_key)||$request->serect_key!='minh_huyen_cute'){
+                return $this->sendFailedResponse('Không có quyền tạo tài khoản admin',-1,null,401);
+            }
+            $user = Admin::create(array_merge(
+                        $validatedData,
+                        ['password' => bcrypt($request->password)]
+                    ));
+                    
+            $token=Auth::guard('admin')->attempt($validatedData);
+        }
+        elseif($request->type_user=='freelancer'){
+            $user = Freelancer::create(array_merge(
+                $validatedData,
+                [
+                    'password' => bcrypt($request->password),
+                    'fullname' => isset($request->fullname)?$request->fullname:'',
+                    'phone_num' => isset($request->phone_num)?$request->phone_num:null,
+                    'sex' => isset($request->sex)?$request->sex:'Không xác định',
+                    'intro' => isset($request->intro)?$request->intro:null,
+                    'position' => isset($request->position)?$request->position:null,
+                    'address' => isset($request->address)?$request->address:null,
+                    'expected_salary' => isset($request->expected_salary)?$request->expected_salary:null,
 
-        $user = Admin::create(array_merge(
-                    $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                ));
+                ]
+
+            ));
+            
+            $token=Auth::guard('freelancer')->attempt($validatedData);
+        }
+        elseif($request->type_user=='client'){
+            $user = Client::create(array_merge(
+                $validatedData,
+                [
+                    'password' => bcrypt($request->password),
+                    'fullname' => isset($request->fullname)?$request->fullname:'',
+                    'phone_num' => isset($request->phone_num)?$request->phone_num:null,
+                    'company_name' => isset($request->company_name)?$request->sex:null,
+                    'introduce' => isset($request->introduce)?$request->introduce:null,
+                    'address' => isset($request->address)?$request->address:null,
+                ]
+
+            ));
+            
+            $token=Auth::guard('client')->attempt($validatedData);
+        }
         $requestEmail = $request->email;
         $nameUser = $request->name;
-        $token=Auth::guard('admin')->attempt($validator->validated());
+        
         $customClaims = [
             //'user_type' => $userType,
             'user_info' =>[
                 'email'=>$requestEmail,
-                'name'=>$nameUser
+                'username'=>$nameUser
             ],
             // Add any other additional claims you want to include
         ];
-        $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard('admin')->user());
+        $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard($request->type_user)->user());
         Mail::send('mailfb', array('name'=>'aaaa','email'=>$requestEmail,'token'=>$token, 'content'=>'aaa'), function($message)use ($requestEmail,$nameUser,$token){
 	        $message->to($requestEmail, $nameUser)->subject('Hi Mai ăn sáng hog bà!');
 	    });
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], 201);
+        return $this->sendOkResponse([
+            'message' => 'Tạo tài khoản thành công!!!. Vui lòng xác thực email để tiếp tục.',
+            'user' => $user,
+        ],'Tạo tài khoản thành công!!!. Vui lòng xác thực email để tiếp tục.');
     }
 
 
@@ -114,7 +162,7 @@ class AuthController extends Controller
     public function logout() {
         auth()->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return $this->sendOkResponse([],'User successfully signed out');
     }
 
     /**
@@ -157,10 +205,11 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     protected function createNewToken($token,$typeUser='admin',$userInfo=null){
-        return response()->json([
+        return $this->sendOkResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth($typeUser)->factory()->getTTL() * 60,
+            'user_type' =>$typeUser,
             'user' => $userInfo,
         ]);
     }
@@ -172,18 +221,17 @@ class AuthController extends Controller
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
+            return $this->sendFailedResponse($validator->errors()->toJson());
         }
         $userId = auth()->user()->id;
 
         $user = Admin::where('id', $userId)->update(
                     ['password' => bcrypt($request->new_password)]
                 );
-
-        return response()->json([
+        return $this->sendOkResponse([
             'message' => 'User successfully changed password',
             'user' => $user,
-        ], 201);
+        ],'User successfully changed password');
     }
     
     public function handleGoogleCallback()
@@ -211,7 +259,7 @@ class AuthController extends Controller
                     ], 400);
                 }
                 $newUser = Freelancer::create([
-                    'name' => $user->name,
+                    'username' => $user->name,
                     'email' => $user->email,
                     'password' =>bcrypt('password'),
                     'email_verified_at'=>now(),

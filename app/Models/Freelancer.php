@@ -18,14 +18,14 @@ class Freelancer extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'google_id',
-        'email_verified_at'
-    ];
-    protected $guard =[] ;
+    // protected $fillable = [
+    //     'name',
+    //     'email',
+    //     'password',
+    //     'google_id',
+    //     'email_verified_at'
+    // ];
+    protected $guarded =[] ;
 
     /**
      * The attributes that should be hidden for serialization.

@@ -64,11 +64,6 @@ trait ApiResponseTrait
         if (defined('LARAVEL_START')) 
             $time_exc = round((microtime((true)) - LARAVEL_START) * 1000);
         
-        if (app()->bound('timeTracker'))
-            $timeTraker = app('timeTracker')->getAllElapsedTimes();
-        if($time_exc>=5000){
-            Log::channel('custom_api_timeout')->notice("API TIME OVER: Time[".$time_exc."ms] ".url()." timeLog:".json_encode($timeTraker));
-        }
 
         $aRes=['data' => $data, 'message' => $message, 'result' => $result, 'status' => $httpCode, 'error' => null];
         

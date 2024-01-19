@@ -20,12 +20,12 @@ class Admin extends Authenticatable implements JWTSubject,MustVerifyEmail
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
-    protected $guard =[] ;
+    // protected $fillable = [
+    //     'name',
+    //     'email',
+    //     'password',
+    // ];
+    protected $guarded =[] ;
 
     /**
      * The attributes that should be hidden for serialization.
