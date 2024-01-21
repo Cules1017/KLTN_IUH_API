@@ -83,7 +83,7 @@ class AuthController extends Controller
             'type_user' => 'required|string|in:freelancer,admin,client'
         ]);
         if($validator->fails()){
-            return $this->sendFailedResponse($validator->errors()->toJson());
+            return $this->sendFailedResponse($validator->errors()->toJson(),-1,null,422);
         }
         $validatedData = collect($validator->validated())->except('type_user')->all();
         if($request->type_user=='admin'){
@@ -101,14 +101,15 @@ class AuthController extends Controller
             $user = Freelancer::create(array_merge(
                 $validatedData,
                 [
-                    'password' => bcrypt($request->password),
-                    'fullname' => isset($request->fullname)?$request->fullname:'',
-                    'phone_num' => isset($request->phone_num)?$request->phone_num:null,
-                    'sex' => isset($request->sex)?$request->sex:'Không xác định',
-                    'intro' => isset($request->intro)?$request->intro:null,
-                    'position' => isset($request->position)?$request->position:null,
-                    'address' => isset($request->address)?$request->address:null,
-                    'expected_salary' => isset($request->expected_salary)?$request->expected_salary:null,
+                    'password'       => bcrypt($request->password),
+                    'first_name'        => isset($request->first_name)?$request->first_name:'',
+                    'last_name'         => isset($request->last_name)?$request->last_name:'',
+                    'phone_num'         => isset($request->phone_num)?$request->phone_num:null,
+                    'sex'            => isset($request->sex)?$request->sex:'Không xác định',
+                    'intro'             => isset($request->intro)?$request->intro:null,
+                    'position'           => isset($request->position)?$request->position:null,
+                    'address'           => isset($request->address)?$request->address:null,
+                    'expected_salary'   => isset($request->expected_salary)?$request->expected_salary:null,
 
                 ]
 
@@ -121,7 +122,8 @@ class AuthController extends Controller
                 $validatedData,
                 [
                     'password' => bcrypt($request->password),
-                    'fullname' => isset($request->fullname)?$request->fullname:'',
+                    'first_name' => isset($request->first_name)?$request->first_name:'',
+                    'last_name' => isset($request->last_name)?$request->last_name:'',
                     'phone_num' => isset($request->phone_num)?$request->phone_num:null,
                     'company_name' => isset($request->company_name)?$request->sex:null,
                     'introduce' => isset($request->introduce)?$request->introduce:null,
@@ -194,7 +196,7 @@ class AuthController extends Controller
             $user->email_verified_at = now();
             $user->save();
         }
-     return  redirect('https://www.google.com/');
+     return  redirect(env('FRONTEND_URL'));
     }
 
     /**

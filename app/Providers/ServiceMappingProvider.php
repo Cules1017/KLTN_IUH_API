@@ -12,13 +12,9 @@ class ServiceMappingProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    
+    public function register()
     {
-        $aMapping = [
-            
-        ];
-        foreach ($aMapping as $key => $value) {
-            $this->app->singleton('App\Services\\' . $key . '\I' . $value . 'Service', 'App\Services\\' . $key . '\\' . $value . 'Service');
-        }
+        $this->app->bind('App\Services\IAdminService', 'App\Services\AdminService');
     }
 }

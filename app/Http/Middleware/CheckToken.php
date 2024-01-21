@@ -24,17 +24,19 @@ class CheckToken
     public function handle(Request $request, Closure $next)
     { 
         //decode token
-        $token = JWTAuth::getToken();
-        $apy = JWTAuth::getPayload($token)->toArray();
-        dd($apy,strtotime(now()));
+        
         
         try {
-          
-            if (! $user = JWTAuth::parseToken()->authenticate()) {
-                
-                return $this->sendNotFoundResponse('user not found');
-            }
-    
+            $token = JWTAuth::getToken();
+        $apy = JWTAuth::getPayload($token)->toArray();
+       
+        if($apy['exp']<=strtotime(now())){
+            return $this->sendFailedResponse("Đã quá hạn phiên đăng nhập vui lòng đăng nhập lại.",JsonResponse::HTTP_UNAUTHORIZED,  [], JsonResponse::HTTP_UNAUTHORIZED, null);
+        }
+        global $user_info;
+        $user_info=auth($apy['user_type'])->user();
+        $user_info['user_type']=$apy['user_type'];
+
         } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             # token_expired
             return $this->sendFailedResponse($e->getMessage(),JsonResponse::HTTP_UNAUTHORIZED,  [], JsonResponse::HTTP_UNAUTHORIZED, null);

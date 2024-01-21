@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::group(['prefix' => env('APP_VERSION','v1'), 'namespace' => 'App\Http\Controllers'], function () {
+
+Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Controllers'], function () {
     Route::group(
         ['middleware' => ['api']],
         function () {
@@ -25,9 +28,18 @@ Route::group(['prefix' => env('APP_VERSION','v1'), 'namespace' => 'App\Http\Cont
         }
     );
     Route::group(
-        ['middleware' => 'checktoken'],
+        ['middleware' => 'checktoken'], //
         function () {
             Route::get('/test', 'AuthController@login')->name('login');
+            Route::group(
+                ['prefix' => 'administrator', 'middleware' => 'isAdmin'],
+                function () {
+                    Route::get('manager', [AdminController::class, 'index']);
+                    Route::post('manager', [AdminController::class, 'store']);
+                    Route::put('manager/{id}', [AdminController::class, 'update']);
+                    Route::delete('manager/{id}', [AdminController::class, 'destroy']);
+                }
+            );
         }
     );
 });
