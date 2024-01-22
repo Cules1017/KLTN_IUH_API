@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Services\IAdminService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdminController extends Controller
 {
@@ -64,6 +67,20 @@ class AdminController extends Controller
                 ['password' => bcrypt('abc123'), 'status' => 1, "email_verified_at" => now()]
             ) //password defaults
         );
+        $customClaims = [
+            //'user_type' => $userType,
+            'user_info' =>[
+                'email'=>$request->email,
+                'username'=>$request->username,
+            ],
+            // Add any other additional claims you want to include
+        ];
+        $requestEmail=$request->email;
+        $nameUser=$request->username;
+        $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard('admin')->user());
+        Mail::send('mailfb', array('name'=>'aaaa','email'=>$requestEmail,'token'=>$token, 'content'=>'aaa'), function($message)use ($requestEmail,$nameUser,$token){
+	        $message->to($requestEmail, $nameUser)->subject('Hi Mai ăn sáng hog bà!');
+	    });
         return $this->sendOkResponse($data);
     }
 
