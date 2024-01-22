@@ -16,10 +16,20 @@ return new class extends Migration
             $table->id();
             $table->string('username');
             $table->string('email')->unique();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('phone_num')->nullable();
+            $table->string('address')->nullable();
+            $table->integer('sex')->nullable();
+            $table->timestamp('date_of_birth')->nullable();
+            $table->string('avatar_url')->nullable();
             $table->integer('position')->nullable();
             $table->integer('status')->default(1);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('google_id')->nullable();
+            $table->string('otp')->nullable();
+            $table->dateTime('otp_exp')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -27,15 +37,21 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('email')->unique();
-            $table->string('fullname')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('phone_num')->nullable();
             $table->string('address')->nullable();
+            $table->integer('sex')->nullable();
+            $table->timestamp('date_of_birth')->nullable();
             $table->string('company_name')->nullable();
             $table->string('introduce')->nullable();
             $table->string('avatar_url')->nullable();
             $table->integer('status')->default(1);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('google_id')->nullable();
+            $table->string('otp')->nullable();
+            $table->dateTime('otp_exp')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -46,7 +62,8 @@ return new class extends Migration
             $table->timestamp('date_of_birth')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('fullname')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('phone_num')->nullable();
             $table->string('address')->nullable();
             $table->string('position')->nullable();
@@ -57,6 +74,8 @@ return new class extends Migration
             $table->float('available_proposal')->nullable();
             $table->integer('status')->default(1);
             $table->string('google_id')->nullable();
+            $table->string('otp')->nullable();
+            $table->dateTime('otp_exp')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -145,20 +164,6 @@ return new class extends Migration
             // Ràng buộc khóa ngoại tới bảng jobs
             $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
         });
-        Schema::create('rate', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('job_id');
-            $table->unsignedBigInteger('freelancer_id');
-            $table->integer('rate_value');
-            $table->integer('status');
-            $table->timestamps();
-
-             // Ràng buộc khóa ngoại tới bảng jobs
-             $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
-
-             // Ràng buộc khóa ngoại tới bảng skills
-             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
-        });
         Schema::create('invite', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('job_id');
@@ -220,6 +225,21 @@ return new class extends Migration
             // Ràng buộc khóa ngoại tới bảng skills
             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
         });
+        Schema::create('feedbacks', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('contract_id');
+            $table->unsignedBigInteger('client_id');
+            $table->integer('rate');
+            $table->integer('comment');
+            $table->integer('status');
+            $table->timestamps();
+
+             // Ràng buộc khóa ngoại tới bảng jobs
+             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
+
+             // Ràng buộc khóa ngoại tới bảng skills
+             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+        });
         Schema::create('hash_contracts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contract_id');
@@ -234,15 +254,32 @@ return new class extends Migration
             $table->unsignedBigInteger('admin_id');
             $table->float('amount');
             $table->integer('status');
+            $table->string('code');
+            $table->dateTime('payment_date');
+            $table->enum('payment_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
             $table->timestamps();
 
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
             $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
         });
-        Schema::create('documents', function (Blueprint $table) {
+        // Schema::create('documents', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->integer('user_id');
+        //     $table->integer('type_user');
+        //     $table->integer('type_document');
+        //     $table->timestamps();
+        // });
+        Schema::create('campain_ads', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
             $table->integer('type_user');
+            $table->string('title');
+            $table->string('message');
+            $table->string('images');
+            $table->string('ads_type');
+            $table->string('time_range');
+            $table->string('linkable');
+            $table->string('position');
+            $table->integer('status');
             $table->integer('type_document');
             $table->timestamps();
         });
