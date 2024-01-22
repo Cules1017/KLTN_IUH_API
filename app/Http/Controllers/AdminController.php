@@ -33,9 +33,15 @@ class AdminController extends Controller
         }
         // Validation rules
         $rules = [
-            'position' => ['required',Rule::in(1,2,3,4)], //[1=>'Administrators', 2=>'Moderating editor', 3=>'Customer care',4=>'Partner']
+            'position' => ['required', Rule::in(1, 2, 3, 4)], //[1=>'Administrators', 2=>'Moderating editor', 3=>'Customer care',4=>'Partner']
             'username' => ['required',  'max:255', Rule::unique('admin')],
             'email' => ['required', 'email', 'max:255', Rule::unique('admin')],
+            'first_name' => ['string', 'max:255'],
+            'last_name' => ['string', 'max:255'],
+            'phone_num' => ['string', 'max:255'],
+            'address' => ['string', 'max:255'],
+            'sex' => ['integer', Rule::in(1, 2)],
+            'date_of_birth' => ['string', 'max:255'],
         ];
 
         // Custom error messages
@@ -53,8 +59,10 @@ class AdminController extends Controller
         }
         $validator = $validator->validated();
         $data = $this->adminService->create(
-            array_merge($validator,
-            ['password' => bcrypt('abc123'),'status'=>1,"email_verified_at"=>now()])//password defaults
+            array_merge(
+                $validator,
+                ['password' => bcrypt('abc123'), 'status' => 1, "email_verified_at" => now()]
+            ) //password defaults
         );
         return $this->sendOkResponse($data);
     }
@@ -71,6 +79,12 @@ class AdminController extends Controller
             $validator = Validator::make($request->all(), [
                 'username' => ['max:255', Rule::unique('admin')->ignore($id)],
                 'email' => ['email', 'max:255', Rule::unique('admin')->ignore($id)],
+                'first_name' => ['string', 'max:255'],
+                'last_name' => ['string', 'max:255'],
+                'phone_num' => ['string', 'max:255'],
+                'address' => ['string', 'max:255'],
+                'sex' => ['integer', Rule::in(1, 2)],
+                'date_of_birth' => ['string', 'max:255'],
             ], $messages);
             if ($validator->fails()) {
                 return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
@@ -79,7 +93,7 @@ class AdminController extends Controller
             $data = $this->adminService->updateAtribute($id, $validator);
             return $this->sendOkResponse($data);
         } else { //luồng này cho admin update người khác
-            if (!in_array($user_info->position, [1])) {
+            if (!in_array($user_info->position, [1,2])) {
                 return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
             }
             // Validation rules
@@ -106,7 +120,8 @@ class AdminController extends Controller
             return $this->sendFailedResponse($data['message'], $data['status'], null, $data['statusCode']);
         }
     }
-    public function destroy($id){
+    public function destroy($id)
+    {
         global $user_info;
         if (!in_array($user_info->position, [1])) {
             return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);

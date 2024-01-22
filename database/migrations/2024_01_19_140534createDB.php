@@ -138,10 +138,11 @@ return new class extends Migration
              // Ràng buộc khóa ngoại tới bảng skills
              $table->foreign('skill_id')->references('id')->on('skills')->onDelete('cascade');
         });
-        Schema::create('freelancer_job', function (Blueprint $table) {
+        Schema::create('candidate_apply_job', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('job_id');
             $table->unsignedBigInteger('freelancer_id');
+            $table->string('cv_url')->nullable();
             $table->integer('status');
             $table->timestamps();
 
@@ -238,7 +239,7 @@ return new class extends Migration
              $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
 
              // Ràng buộc khóa ngoại tới bảng skills
-             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+             $table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
         });
         Schema::create('hash_contracts', function (Blueprint $table) {
             $table->id();
@@ -262,6 +263,16 @@ return new class extends Migration
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
             $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
         });
+        Schema::create('bank_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->integer('user_id');
+            $table->float('account_number');
+            $table->integer('status');
+            $table->string('bank_name');
+            $table->dateTime('payment_date');
+            $table->enum('account_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
+            $table->timestamps();
+        });
         // Schema::create('documents', function (Blueprint $table) {
         //     $table->id();
         //     $table->integer('user_id');
@@ -269,20 +280,20 @@ return new class extends Migration
         //     $table->integer('type_document');
         //     $table->timestamps();
         // });
-        Schema::create('campain_ads', function (Blueprint $table) {
-            $table->id();
-            $table->integer('type_user');
-            $table->string('title');
-            $table->string('message');
-            $table->string('images');
-            $table->string('ads_type');
-            $table->string('time_range');
-            $table->string('linkable');
-            $table->string('position');
-            $table->integer('status');
-            $table->integer('type_document');
-            $table->timestamps();
-        });
+        // Schema::create('campain_ads', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->integer('type_user');
+        //     $table->string('title');
+        //     $table->string('message');
+        //     $table->string('images');
+        //     $table->string('ads_type');
+        //     $table->string('time_range');
+        //     $table->string('linkable');
+        //     $table->string('position');
+        //     $table->integer('status');
+        //     $table->integer('type_document');
+        //     $table->timestamps();
+        // });
     }
 
     /**
