@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SkillController;
+use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,18 +30,28 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
         }
     );
     Route::group(
-        ['middleware' => 'checktoken'], //
+        ['prefix' => 'administrator','middleware' => 'checktoken'], //
         function () {
             Route::get('/test', 'AuthController@login')->name('login');
             Route::group(
-                ['prefix' => 'administrator', 'middleware' => 'isAdmin'],
+                ['prefix' => 'manager', 'middleware' => ['isAdmin','exceptionGuest']],
                 function () {
-                    Route::get('manager', [AdminController::class, 'index']);
-                    Route::post('manager', [AdminController::class, 'store']);
-                    Route::put('manager/{id}', [AdminController::class, 'update']);
-                    Route::delete('manager/{id}', [AdminController::class, 'destroy']);
+                    Route::get('', [AdminController::class, 'index']);
+                    Route::post('', [AdminController::class, 'store']);
+                    Route::put('{id}', [AdminController::class, 'update']);
+                    Route::delete('{id}', [AdminController::class, 'destroy']);
                 }
             );
+            Route::group(
+                ['prefix' => 'skill', 'middleware' => ['isAdmin','exceptionGuest']],
+                function () {
+                    Route::get('', [SkillController::class, 'index']);
+                    Route::post('', [SkillController::class, 'store']);
+                    Route::put('{id}', [SkillController::class, 'update']);
+                    Route::delete('{id}', [SkillController::class, 'destroy']);
+                }
+            );
+            
         }
     );
 });

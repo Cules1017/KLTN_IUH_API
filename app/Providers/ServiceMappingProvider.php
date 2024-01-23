@@ -16,5 +16,6 @@ class ServiceMappingProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('App\Services\IAdminService', 'App\Services\AdminService');
+        $this->app->bind('App\Services\ISkillService', 'App\Services\SkillService');
     }
 }
