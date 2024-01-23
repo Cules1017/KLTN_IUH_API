@@ -38,7 +38,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 function () {
                     Route::get('', [AdminController::class, 'index']);
                     Route::post('', [AdminController::class, 'store']);
-                    Route::put('{id}', [AdminController::class, 'update']);
+                    Route::post('{id}', [AdminController::class, 'update']);
                     Route::delete('{id}', [AdminController::class, 'destroy']);
                 }
             );

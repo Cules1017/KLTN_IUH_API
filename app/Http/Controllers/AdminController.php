@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHelper;
 use App\Services\IAdminService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -69,18 +70,18 @@ class AdminController extends Controller
         );
         $customClaims = [
             //'user_type' => $userType,
-            'user_info' =>[
-                'email'=>$request->email,
-                'username'=>$request->username,
+            'user_info' => [
+                'email' => $request->email,
+                'username' => $request->username,
             ],
             // Add any other additional claims you want to include
         ];
-        $requestEmail=$request->email;
-        $nameUser=$request->username;
+        $requestEmail = $request->email;
+        $nameUser = $request->username;
         $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard('admin')->user());
-        Mail::send('mailfb', array('name'=>'aaaa','email'=>$requestEmail,'token'=>$token, 'content'=>'aaa'), function($message)use ($requestEmail,$nameUser,$token){
-	        $message->to($requestEmail, $nameUser)->subject('Hi Mai ăn sáng hog bà!');
-	    });
+        Mail::send('mailfb', array('name' => 'aaaa', 'email' => $requestEmail, 'token' => $token, 'content' => 'aaa'), function ($message) use ($requestEmail, $nameUser, $token) {
+            $message->to($requestEmail, $nameUser)->subject('Hi Mai ăn sáng hog bà!');
+        });
         return $this->sendOkResponse($data);
     }
 
@@ -102,15 +103,26 @@ class AdminController extends Controller
                 'address' => ['string', 'max:255'],
                 'sex' => ['integer', Rule::in(1, 2)],
                 'date_of_birth' => ['string', 'max:255'],
+                'avatar' =>  [
+                    'nullable',
+                    'image',
+                    'mimes:jpeg,png,jpg,gif',
+                    'max:2048'
+                ],
             ], $messages);
             if ($validator->fails()) {
                 return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
             }
             $validator = $validator->validated();
-            $data = $this->adminService->updateAtribute($id, $validator);
+            $imagePath = null;
+            if ($request->hasFile('avatar')) {
+                $imagePath = FileHelper::saveImage($request->file('avatar'), 'admin', 'avatar');
+            }
+            unset($validator['avatar']);
+            $data = $this->adminService->updateAtribute($id, array_merge($validator, ['avatar_url' => $imagePath]));
             return $this->sendOkResponse($data);
         } else { //luồng này cho admin update người khác
-            if (!in_array($user_info->position, [1,2])) {
+            if (!in_array($user_info->position, [1, 2])) {
                 return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
             }
             // Validation rules
