@@ -30,8 +30,11 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
+            $table->unsignedBigInteger('bank_account');
             $table->rememberToken();
             $table->timestamps();
+
+            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         Schema::create('client', function (Blueprint $table) {
             $table->id();
@@ -52,8 +55,10 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
+            $table->unsignedBigInteger('bank_account');
             $table->rememberToken();
             $table->timestamps();
+            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         Schema::create('freelancer', function (Blueprint $table) {
             $table->id();
@@ -76,8 +81,10 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
+            $table->unsignedBigInteger('bank_account');
             $table->rememberToken();
             $table->timestamps();
+            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         Schema::create('policy_config', function (Blueprint $table) {
             $table->id();
