@@ -56,4 +56,9 @@ class SkillController extends Controller
         $data = $this->skillService->updateAtribute($id,$request->all());
         return $this->sendOkResponse($data);
     }
+    public function destroy($id)
+    {
+        $this->skillService->destroy($id);
+        return $this->sendOkResponse();
+    }
 }

@@ -155,7 +155,7 @@ class AdminController extends Controller
         if (!in_array($user_info->position, [1])) {
             return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
         }
-        $this->destroy($id);
+        $this->adminService->destroy($id);
         return $this->sendOkResponse();
     }
 }
