@@ -71,6 +71,15 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::delete('{id}', [FreelancerController::class, 'destroy']);
                 }
             );
+            Route::group(
+                ['prefix' => 'systerm-config', 'middleware' => ['isAdmin','exceptionGuest']],
+                function () {
+                    Route::get('', [FreelancerController::class, 'index']);
+                    Route::post('', [ClientController::class, 'store']);
+                    Route::put('{id}', [FreelancerController::class, 'update']);
+                    Route::delete('{id}', [FreelancerController::class, 'destroy']);
+                }
+            );
             
         }
     );

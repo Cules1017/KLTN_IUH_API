@@ -12,6 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         //Bảng độc lập
+        Schema::create('bank_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->integer('user_id');
+            $table->float('account_number');
+            $table->integer('status');
+            $table->string('bank_name');
+            $table->dateTime('payment_date');
+            $table->enum('account_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
+            $table->timestamps();
+        });
         Schema::create('admin', function (Blueprint $table) {
             $table->id();
             $table->string('username');
@@ -270,16 +280,7 @@ return new class extends Migration
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
             $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
         });
-        Schema::create('bank_accounts', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id');
-            $table->float('account_number');
-            $table->integer('status');
-            $table->string('bank_name');
-            $table->dateTime('payment_date');
-            $table->enum('account_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
-            $table->timestamps();
-        });
+        
         // Schema::create('documents', function (Blueprint $table) {
         //     $table->id();
         //     $table->integer('user_id');
