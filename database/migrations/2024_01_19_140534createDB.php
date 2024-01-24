@@ -102,8 +102,9 @@ return new class extends Migration
             $table->string('key');
             $table->string('desc');
             $table->string('value');
-            $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
+            $table->unsignedBigInteger('admin_id');
             $table->timestamps();
+            $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
         });
         Schema::create('skills', function (Blueprint $table) {
             $table->id();
