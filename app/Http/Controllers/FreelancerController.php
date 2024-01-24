@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FileHelper;
 use App\Services\IAdminService;
-use App\Services\IClientService;
+use App\Services\IFreelancerService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class ClientController extends Controller
+class FreelancerController extends Controller
 {
-    public $clientService;
-    public function __construct(IClientService $clientService)
+    public $freelancerService;
+    public function __construct(IFreelancerService $freelancerService)
     {
-        $this->clientService = $clientService;
+        $this->freelancerService = $freelancerService;
     }
     public function index(Request $request)
     {
@@ -28,15 +28,14 @@ class ClientController extends Controller
         $sex = $request->sex;
         $status = $request->status;
 
-        $data = $this->clientService->getList($num, $page, $searchValue, $id, $status, $sex);
+        $data = $this->freelancerService->getList($num, $page, $searchValue, $id, $status, $sex);
         return $this->sendOkResponse($data);
     }
 
     public function update($id, Request $request)
     {
         //case1 update lại khi qua đến client
-        global $user_info;
-
+        global $user_info; //luồng này cho admin update người khác
         if (!isset($user_info->position) || !in_array($user_info->position, [1, 2])) {
             return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
         }
@@ -54,7 +53,7 @@ class ClientController extends Controller
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
         $validator = $validator->validated();
-        $data = $this->clientService->updateAtribute($id, $validator);
+        $data = $this->freelancerService->updateAtribute($id, $validator);
 
         return $this->sendOkResponse($data);
     }
@@ -64,7 +63,7 @@ class ClientController extends Controller
         if (!in_array($user_info->position, [1])) {
             return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
         }
-        $this->clientService->destroy($id);
+        $this->freelancerService->destroy($id);
         return $this->sendOkResponse();
     }
 }

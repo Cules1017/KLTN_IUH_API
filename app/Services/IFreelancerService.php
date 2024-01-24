@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-interface IClientService
+interface IFreelancerService
 {
     public function create($attributes = []);
     public function getList($num=10,$page=1,$searchKeyword='',$id,$status=null,$sex=null);

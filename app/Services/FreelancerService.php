@@ -4,18 +4,19 @@ namespace App\Services;
 
 use App\Models\Admin;
 use App\Models\Client;
+use App\Models\Freelancer;
 use App\Models\Skill;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class ClientService implements IClientService
+class FreelancerService implements IFreelancerService
 {
     public function create($attributes = [])
     {
         try {
            // dd($attributes);
-            return Skill::create($attributes);
+            return Freelancer::create($attributes);
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
@@ -25,7 +26,7 @@ class ClientService implements IClientService
     {
         try {
         // Xây dựng query Eloquent
-        $query = Client::query();
+        $query = Freelancer::query();
         if($id){
             $query->where('id','=',$id);
         }
@@ -33,8 +34,7 @@ class ClientService implements IClientService
             $query->where('username', 'like', '%' . $searchKeyword . '%')
             ->orWhere('email', 'like', '%' . $searchKeyword . '%')
             ->orWhere('first_name', 'like', '%' . $searchKeyword . '%')
-            ->orWhere('last_name', 'like', '%' . $searchKeyword . '%')
-            ->orWhere('company_name', 'like', '%' . $searchKeyword . '%');
+            ->orWhere('last_name', 'like', '%' . $searchKeyword . '%');
         }
         if($status!=null)
             $query->where('status', '=',  $status);
@@ -65,7 +65,7 @@ class ClientService implements IClientService
 
     public function updateAtribute($id,$attribute){
         try {
-            $admin=Client::findOrFail($id);
+            $admin=Freelancer::findOrFail($id);
             $admin->update($attribute);
             return $admin;
         } catch (Throwable $e) {
@@ -75,8 +75,8 @@ class ClientService implements IClientService
 
     public function destroy($id){
         try {
-            $admin=Client::findOrFail($id);
-            $admin->destroy();
+            $admin=Freelancer::findOrFail($id);
+            Freelancer::destroy($id);
             return $admin;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);

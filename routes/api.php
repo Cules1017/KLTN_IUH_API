@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\SkillController;
 use App\Models\Skill;
 use Illuminate\Http\Request;
@@ -59,6 +60,15 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     //Route::post('', [ClientController::class, 'store']);
                     Route::put('{id}', [ClientController::class, 'update']);
                     Route::delete('{id}', [ClientController::class, 'destroy']);
+                }
+            );
+            Route::group(
+                ['prefix' => 'freelancer', 'middleware' => ['isAdmin','exceptionGuest']],
+                function () {
+                    Route::get('', [FreelancerController::class, 'index']);
+                    //Route::post('', [ClientController::class, 'store']);
+                    Route::put('{id}', [FreelancerController::class, 'update']);
+                    Route::delete('{id}', [FreelancerController::class, 'destroy']);
                 }
             );
             
