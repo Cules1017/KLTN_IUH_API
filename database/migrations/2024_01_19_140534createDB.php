@@ -96,18 +96,13 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
-        Schema::create('policy_config', function (Blueprint $table) {
-            $table->id();
-            $table->string('key');
-            $table->string('desc');
-            $table->string('value');
-            $table->timestamps();
-        });
+        
         Schema::create('systerm_config', function (Blueprint $table) {
             $table->id();
             $table->string('key');
             $table->string('desc');
             $table->string('value');
+            $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
             $table->timestamps();
         });
         Schema::create('skills', function (Blueprint $table) {
