@@ -32,8 +32,8 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('abc123')
         ]);
         \App\Models\Freelancer::create([
-            'username' => 'freelancer',
-            'email' => 'freelancer@gmail.com',
+            'username' => 'freelancer1',
+            'email' => 'freelancer1@gmail.com',
             'password' => bcrypt('abc123')
         ]);
 

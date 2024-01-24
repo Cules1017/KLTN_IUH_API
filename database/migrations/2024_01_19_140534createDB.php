@@ -40,7 +40,7 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account');
+            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
@@ -65,7 +65,7 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account');
+            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
@@ -91,7 +91,7 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account');
+            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
