@@ -4,7 +4,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\SystermConfigController;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,10 +76,19 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::group(
                 ['prefix' => 'systerm-config', 'middleware' => ['isAdmin','exceptionGuest']],
                 function () {
-                    Route::get('', [FreelancerController::class, 'index']);
-                    Route::post('', [ClientController::class, 'store']);
-                    Route::put('{id}', [FreelancerController::class, 'update']);
-                    Route::delete('{id}', [FreelancerController::class, 'destroy']);
+                    Route::get('', [SystermConfigController::class, 'index']);
+                    Route::post('', [SystermConfigController::class, 'store']);
+                    Route::put('{id}', [SystermConfigController::class, 'update']);
+                    Route::delete('{id}', [SystermConfigController::class, 'destroy']);
+                }
+            );
+            Route::group(
+                ['prefix' => 'report', 'middleware' => ['isAdmin','exceptionGuest']],
+                function () {
+                    Route::get('', [ReportController::class, 'index']);
+                  //  Route::post('', [ReportController::class, 'store']);
+                    Route::put('resolve/{id}', [ReportController::class, 'updateAdmin']);
+                   // Route::delete('{id}', [ReportController::class, 'destroy']);
                 }
             );
             

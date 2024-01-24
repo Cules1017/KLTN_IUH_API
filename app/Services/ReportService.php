@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\SystermConfig;
+use App\Models\Report;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
@@ -13,22 +13,22 @@ class ReportService implements IReportService
     {
         try {
            // dd($attributes);
-            return SystermConfig::create($attributes);
+            return Report::create($attributes);
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
     }
 
-    public function getList($num=10,$page=1,$searchKeyword='',$id)
+    public function getList($num=10,$page=1,$type_result=null,$id)
     {
         try {
         // Xây dựng query Eloquent
-        $query = SystermConfig::query();
+        $query = Report::query();
         if($id){
             $query->where('id','=',$id);
         }
-        elseif ($searchKeyword!=='') {
-            $query->where('key', 'like', '%' . $searchKeyword . '%');
+        elseif ($type_result!==null) {
+            $query->where('type_id', '=',  $type_result );
         }
         // Lấy tổng số admin
         $total = $query->count();
@@ -55,7 +55,7 @@ class ReportService implements IReportService
 
     public function updateAtribute($id,$attribute){
         try {
-            $admin=SystermConfig::findOrFail($id);
+            $admin=Report::findOrFail($id);
             $admin->update($attribute);
             return $admin;
         } catch (Throwable $e) {
@@ -65,8 +65,8 @@ class ReportService implements IReportService
 
     public function destroy($id){
         try {
-            $admin=SystermConfig::findOrFail($id);
-            SystermConfig::destroy($id);
+            $admin=Report::findOrFail($id);
+            Report::destroy($id);
             return $admin;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);

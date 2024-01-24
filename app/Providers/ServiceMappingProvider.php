@@ -19,5 +19,7 @@ class ServiceMappingProvider extends ServiceProvider
         $this->app->bind('App\Services\ISkillService', 'App\Services\SkillService');
         $this->app->bind('App\Services\IClientService', 'App\Services\ClientService');
         $this->app->bind('App\Services\IFreelancerService', 'App\Services\FreelancerService');
+        $this->app->bind('App\Services\ISystermConfigService', 'App\Services\SystermConfigService');
+        $this->app->bind('App\Services\IReportService', 'App\Services\ReportService');
     }
 }

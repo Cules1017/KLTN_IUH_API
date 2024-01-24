@@ -68,12 +68,13 @@ class SystermConfigController extends Controller
         }
         // Validation rules
         $rules = [
-            'status' => [Rule::in([0, 1])], // 0-> trạng thái khóa, 1- trạng thái hoạt động
+            'key' => ['required','string',Rule::unique('systerm_config')->ignore($id)], 
+            'value'=>['required','string'],
+            'desc'=>['string'],
         ];
 
         // Custom error messages
         $messages = [
-            'status.in' => 'Trạng thái không hợp lệ.',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
