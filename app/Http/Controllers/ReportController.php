@@ -59,7 +59,7 @@ class ReportController extends Controller
         return $this->sendOkResponse($data);
     }
 
-    public function update($id, Request $request)
+    public function adminUpdate($id, Request $request)
     {
         //case1 update lại khi qua đến client
         global $user_info; //luồng này cho admin update người khác

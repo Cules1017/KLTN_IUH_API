@@ -18,7 +18,6 @@ return new class extends Migration
             $table->float('account_number');
             $table->integer('status');
             $table->string('bank_name');
-            $table->dateTime('payment_date');
             $table->enum('account_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
             $table->timestamps();
         });
