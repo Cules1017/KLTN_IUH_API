@@ -62,7 +62,7 @@ class JobController extends Controller
         return $this->sendOkResponse($data);
     }
 
-    public function update($id, Request $request)
+    public function updateAdmin($id, Request $request)
     {
         // Validation rules
         $rules = [

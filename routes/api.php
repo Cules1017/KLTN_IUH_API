@@ -89,6 +89,13 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::put('resolve/{id}', [ReportController::class, 'updateAdmin']);
                 }
             );
+            Route::group(
+                ['prefix' => 'post', 'middleware' => ['isAdmin','exceptionGuest']],
+                function () {
+                    Route::get('', [ReportController::class, 'index']);
+                    Route::put('resolve/{id}', [ReportController::class, 'updateAdmin']);
+                }
+            );
             
         }
     );
