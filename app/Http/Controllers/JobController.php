@@ -64,16 +64,9 @@ class JobController extends Controller
 
     public function update($id, Request $request)
     {
-        //case1 update lại khi qua đến client
-        global $user_info; //luồng này cho admin update người khác
-        if (!isset($user_info->position) || !in_array($user_info->position, [1, 2])) {
-            return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
-        }
         // Validation rules
         $rules = [
-            'key' => ['required','string',Rule::unique('systerm_config')->ignore($id)], 
-            'value'=>['required','string'],
-            'desc'=>['string'],
+            'status'=>['required'],
         ];
 
         // Custom error messages
@@ -91,10 +84,6 @@ class JobController extends Controller
     
     public function destroy($id)
     {
-        global $user_info;
-        if (!in_array($user_info->position, [1])) {
-            return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
-        }
         $this->jobService->destroy($id);
         return $this->sendOkResponse();
     }

@@ -86,13 +86,5 @@ class ReportController extends Controller
         return $this->sendOkResponse($data);
     }
     
-    public function destroy($id)
-    {
-        global $user_info;
-        if (!in_array($user_info->position, [1])) {
-            return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
-        }
-        $this->reportService->destroy($id);
-        return $this->sendOkResponse();
-    }
+   
 }
