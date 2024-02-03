@@ -38,18 +38,33 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'userName' => 'required_without:email|string',
-            'email' => 'required_without:username|string|email',
+            'email' => 'required_without:userName|string|email',
             'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, null, 422);
         }
+
         $userType = null;
-        if (Auth::guard('admin')->attempt($validator->validated()))
+        $infoLogin = [];
+        if (empty($validator->validated()['userName'])) {
+            $infoLogin = [
+                'email' => $validator->validated()['email'],
+                'password' => $validator->validated()['password'],
+            ];
+        } else {
+            $infoLogin =  [
+                'username' => $validator->validated()['userName'],
+                'password' => $validator->validated()['password'],
+            ];
+        }
+        if (Auth::guard('admin')->attempt($infoLogin))
             $userType = 'admin';
-        if (Auth::guard('client')->attempt($validator->validated()))
+        if (Auth::guard('client')->attempt($infoLogin))
             $userType = 'client';
+        if (Auth::guard('freelancer')->attempt($infoLogin))
+            $userType = 'freelancer';
         //dd(Auth::guard('client')->attempt($validator->validated()),Auth::guard('admin')->attempt($validator->validated()),!(Auth::guard('client')->attempt($validator->validated())&&Auth::guard('admin')->attempt($validator->validated())));
         if ($userType == null) {
             return $this->sendFailedResponse('Unauthorized', -1, null, 401);
@@ -114,8 +129,8 @@ class AuthController extends Controller
                     'last_name'         => isset($request->lastName) ? $request->lastName : '',
                     'date_of_birth'         => isset($request->dateOfBirth) ? $request->dateOfBirth : null,
                     'phone_num'         => isset($request->phoneNum) ? $request->phoneNum : null,
-                    'sex'            => isset($request->sex) ? $request->sex : 'Không xác định',
-                    'position'            => isset($request->position)?$request->position:1,
+                    'sex'            => isset($request->sex) ? $request->sex : 0,
+                    'position'            => isset($request->position) ? $request->position : 1,
                     'intro'             => isset($request->intro) ? $request->intro : null,
                     'address'           => isset($request->address) ? $request->address : null,
 
@@ -132,7 +147,7 @@ class AuthController extends Controller
                     'last_name'         => isset($request->lastName) ? $request->lastName : '',
                     'date_of_birth'         => isset($request->dateOfBirth) ? $request->dateOfBirth : null,
                     'phone_num'         => isset($request->phoneNum) ? $request->phoneNum : null,
-                    'sex'            => isset($request->sex) ? $request->sex : 'Không xác định',
+                    'sex'            => isset($request->sex) ? $request->sex : 0,
                     'intro'             => isset($request->intro) ? $request->intro : null,
                     'address'           => isset($request->address) ? $request->address : null,
                     'expected_salary'   => isset($request->expectedSalary) ? $request->expectedSalary : null,
@@ -150,7 +165,7 @@ class AuthController extends Controller
                     'first_name' => isset($request->firstName) ? $request->firstName : '',
                     'last_name' => isset($request->lastName) ? $request->lastName : '',
                     'phone_num' => isset($request->phoneNum) ? $request->phoneNum : null,
-                    'sex'            => isset($request->sex) ? $request->sex : 'Không xác định',
+                    'sex'            => isset($request->sex) ? $request->sex : 0,
                     'company_name' => isset($request->companyName) ? $request->companyName : null,
                     'introduce' => isset($request->introduce) ? $request->introduce : null,
                     'address' => isset($request->address) ? $request->address : null,
@@ -222,6 +237,8 @@ class AuthController extends Controller
 
         $apy = JWTAuth::decode($token);
         $user = Admin::where('email', $apy['user_info']['email'])->first();
+        if ($user == null) $user = Freelancer::where('email', $apy['user_info']['email'])->first();
+        if ($user == null) $user = Client::where('email', $apy['user_info']['email'])->first();
         if ($user) {
             // Update the existing user instance
             $user->email_verified_at = now();
