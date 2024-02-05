@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileHelper;
+use App\Helpers\MyHelper;
+use App\Models\Client;
 use App\Services\IAdminService;
 use App\Services\IClientService;
 use Illuminate\Support\Facades\Validator;
@@ -57,6 +59,53 @@ class ClientController extends Controller
         $data = $this->clientService->updateAtribute($id, $validator);
 
         return $this->sendOkResponse($data);
+    }
+    public function updateForClient(Request $request)
+    {
+        global $user_info;
+        $id = $user_info->id;
+        $rq = MyHelper::convertKeysToSnakeCase($request->all());
+        // Validation rules
+        $rules = [
+            'username' => ['max:255', Rule::unique('client')->ignore($id), Rule::unique('freelancer'), Rule::unique('admin')],
+            'email' => ['email', 'max:255', Rule::unique('client')->ignore($id), Rule::unique('freelancer'), Rule::unique('admin')],
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'phone_num' => 'nullable|string',
+            'address' => 'nullable|string',
+            'sex' => 'nullable|integer',
+            'date_of_birth' => 'nullable|date',
+            'avatar_url' => 'nullable|string',
+            'company_name' => 'nullable|string',
+            'introduce' => 'nullable|string',
+            'bank_account' => 'nullable|exists:bank_accounts,id',
+        ];
+
+        // Custom error messages
+        $messages = [
+            'required' => 'Trường :attribute là bắt buộc.',
+            'unique' => 'Trường :attribute đã tồn tại.',
+            'email' => 'Trường :attribute phải là địa chỉ email hợp lệ.',
+            'string' => 'Trường :attribute phải là chuỗi.',
+            'integer' => 'Trường :attribute phải là số nguyên.',
+            'date' => 'Trường :attribute phải là ngày hợp lệ.',
+            'timestamp' => 'Trường :attribute phải là timestamp hợp lệ.',
+            'exists' => 'Trường :attribute không tồn tại.',
+            'in' => 'Trường :attribute không hợp lệ.',
+        ];
+        $imagePath = '';
+        if ($request->hasFile('avatar')) {
+            $imagePath = FileHelper::saveImage($request->file('avatar'), 'client', 'avatar');
+        }
+
+        $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath]), $rules, $messages);
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        }
+        $validator = $validator->validated();
+        $data=$this->clientService->updateAtribute($id,$validator);
+        return $this->sendOkResponse($data);    
+
     }
     public function destroy($id)
     {

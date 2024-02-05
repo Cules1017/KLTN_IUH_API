@@ -99,4 +99,17 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             
         }
     );
+    Route::group(
+        ['prefix' => 'client','middleware' => 'checktoken'], //
+        function () {
+            Route::group(
+                ['prefix' => 'info', 'middleware' => ['isClient']],
+                function () {
+                    //Route::get('', [ClientController::class, 'index']);
+                    //Route::post('', [ClientController::class, 'store']);
+                    Route::post('update', [ClientController::class, 'updateForClient']);
+                }
+            );
+        }
+    );
 });
