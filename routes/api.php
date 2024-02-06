@@ -4,10 +4,13 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\JobController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SystermConfigController;
+use App\Models\Job;
 use App\Models\Skill;
+use App\Services\JobService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -107,6 +110,14 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 function () {
                     //Route::get('', [ClientController::class, 'index']);
                     //Route::post('', [ClientController::class, 'store']);
+                    Route::post('update', [ClientController::class, 'updateForClient']);
+                    Route::get('', [ClientController::class, 'getInfoClient']);
+                }
+            );
+            Route::group(
+                ['prefix' => 'job', 'middleware' => ['isClient']],
+                function () {
+                    Route::get('/my-jobs', [JobController::class, 'getMyPost']);
                     Route::post('update', [ClientController::class, 'updateForClient']);
                     Route::get('', [ClientController::class, 'getInfoClient']);
                 }

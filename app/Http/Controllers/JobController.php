@@ -31,7 +31,7 @@ class JobController extends Controller
         $bids = $request->bids;
         $status = $request->status;
 
-        $data = $this->jobService->getList($num, $page, $searchValue,$client_info,$min_proposal, $id, $status, $bids);
+        $data = $this->jobService->getList($num, $page, $searchValue, $client_info, $min_proposal, $id, $status, $bids);
         return $this->sendOkResponse($data);
     }
     public function store(Request $request)
@@ -43,15 +43,13 @@ class JobController extends Controller
         }
         // Validation rules
         $rules = [
-            'key' => ['required','string',Rule::unique('systerm_config')], 
-            'value'=>['required','string'],
-            'desc'=>['string'],
+            'key' => ['required', 'string', Rule::unique('systerm_config')],
+            'value' => ['required', 'string'],
+            'desc' => ['string'],
         ];
 
         // Custom error messages
-        $messages = [
-           
-        ];
+        $messages = [];
         $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
@@ -66,12 +64,11 @@ class JobController extends Controller
     {
         // Validation rules
         $rules = [
-            'status'=>['required'],
+            'status' => ['required'],
         ];
 
         // Custom error messages
-        $messages = [
-        ];
+        $messages = [];
         $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
@@ -81,7 +78,50 @@ class JobController extends Controller
 
         return $this->sendOkResponse($data);
     }
-    
+
+    public function getMyPost(Request $request)
+    {
+        $page = $request->page;
+        $num = $request->num;
+        $data = null;
+        global $user_info;
+        $client_id = $user_info->id;
+        $atributes = ['client_id'];
+        $value = [$client_id];
+        // Validation rules
+        if ($request->status !== null) {
+            array_push($atributes, 'status');
+            array_push($value, $request->status);
+        }
+        if ($page && $num) {
+            $data = $this->jobService->getJobByAtribute($atributes, $value, $page, $num);
+        } else {
+            $data = $this->jobService->getJobByAtribute($atributes, $value);
+        }
+        return $this->sendOkResponse($data);
+    }
+    // public function createNewPost(Request $request)
+    // {
+    //     $page = $request->page;
+    //     $num = $request->num;
+    //     $data = null;
+    //     global $user_info;
+    //     $client_id = $user_info->id;
+    //     $atributes = ['client_id'];
+    //     $value = [$client_id];
+    //     // Validation rules
+    //     if ($request->status !== null) {
+    //         array_push($atributes, 'status');
+    //         array_push($value, $request->status);
+    //     }
+    //     if ($page && $num) {
+    //         $data = $this->jobService->getJobByAtribute($atributes, $value, $page, $num);
+    //     } else {
+    //         $data = $this->jobService->getJobByAtribute($atributes, $value);
+    //     }
+    //     return $this->sendOkResponse($data);
+    // }
+
     public function destroy($id)
     {
         $this->jobService->destroy($id);
