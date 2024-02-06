@@ -88,6 +88,48 @@ class JobController extends Controller
         $client_id = $user_info->id;
         $atributes = ['client_id'];
         $value = [$client_id];
+
+        $rules = [
+            'title' => 'required|string|max:255',
+            'desc' => 'required|string|max:255',
+            'content' => 'required|string|max:255',
+            'thumbnail' => 'string|max:255',
+            'bids' => 'required|numeric|min:0', // Đảm bảo bids là số dương hoặc bằng 0
+            'deadline' => 'required|date', // Đảm bảo deadline là kiểu ngày
+        ];
+        $messages = [
+            'required' => 'Trường :attribute là bắt buộc.',
+            'exists' => 'Trường :attribute không tồn tại trong bảng :table.',
+            'string' => 'Trường :attribute phải là chuỗi.',
+            'max' => 'Trường :attribute không được vượt quá :max ký tự.',
+            'numeric' => 'Trường :attribute phải là số.',
+            'integer' => 'Trường :attribute phải là số nguyên.',
+            'min' => 'Trường :attribute phải lớn hơn hoặc bằng :min.',
+            'date' => 'Trường :attribute phải là ngày hợp lệ.',
+        ];
+        // Tạo Validator
+        $validator = Validator::make($request->all(), $rules, $messages);
+        
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        }
+        $validator = $validator->validated();
+        $imagePath = $request->thumbnail ? $request->thumbnail : '';
+        if ($request->hasFile('avatar')) {
+            $imagePath = FileHelper::saveImage($request->file('thumbnail'), 'client', 'avatar');
+        }
+        $data = $this->jobService->create(array_merge($validator, ['thumbnail' => $imagePath, 'status' => 1]));
+        return $this->sendOkResponse($data);
+    }
+    public function createNewPost(Request $request)
+    {
+        $page = $request->page;
+        $num = $request->num;
+        $data = null;
+        global $user_info;
+        $client_id = $user_info->id;
+        $atributes = ['client_id'];
+        $value = [$client_id];
         // Validation rules
         if ($request->status !== null) {
             array_push($atributes, 'status');
@@ -100,27 +142,6 @@ class JobController extends Controller
         }
         return $this->sendOkResponse($data);
     }
-    // public function createNewPost(Request $request)
-    // {
-    //     $page = $request->page;
-    //     $num = $request->num;
-    //     $data = null;
-    //     global $user_info;
-    //     $client_id = $user_info->id;
-    //     $atributes = ['client_id'];
-    //     $value = [$client_id];
-    //     // Validation rules
-    //     if ($request->status !== null) {
-    //         array_push($atributes, 'status');
-    //         array_push($value, $request->status);
-    //     }
-    //     if ($page && $num) {
-    //         $data = $this->jobService->getJobByAtribute($atributes, $value, $page, $num);
-    //     } else {
-    //         $data = $this->jobService->getJobByAtribute($atributes, $value);
-    //     }
-    //     return $this->sendOkResponse($data);
-    // }
 
     public function destroy($id)
     {
