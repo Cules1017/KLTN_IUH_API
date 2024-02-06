@@ -61,7 +61,15 @@ class ClientService implements IClientService
         }
     }
 
-    
+    public function getById($id)
+    {
+        try {
+            $admin=Client::findOrFail($id);
+            return $admin;
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage(), null, 400);
+        }
+    }
 
     public function updateAtribute($id,$attribute){
         try {

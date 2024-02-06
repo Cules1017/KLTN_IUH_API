@@ -107,6 +107,13 @@ class ClientController extends Controller
         return $this->sendOkResponse($data);    
 
     }
+
+    public function getInfoClient(Request $request){
+        global $user_info;
+        $id = $user_info->id;
+        $data = $this->clientService->getById($id);
+        return $this->sendOkResponse($data);
+    }
     public function destroy($id)
     {
         global $user_info;

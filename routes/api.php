@@ -108,6 +108,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     //Route::get('', [ClientController::class, 'index']);
                     //Route::post('', [ClientController::class, 'store']);
                     Route::post('update', [ClientController::class, 'updateForClient']);
+                    Route::get('', [ClientController::class, 'getInfoClient']);
                 }
             );
         }
