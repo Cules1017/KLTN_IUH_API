@@ -9,4 +9,6 @@ interface IJobService
     public function updateAtribute($id,$attribute);
     public function destroy($id);
     public function getJobByAtribute(array $attributes, array $values,$page,$num);
+    public function getById($id);
+    public function updateWithData($id, $attributes = []);
 }

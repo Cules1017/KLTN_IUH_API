@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Job;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
@@ -12,8 +13,57 @@ class JobService implements IJobService
     public function create($attributes = [])
     {
         try {
-            // dd($attributes);
-            return Job::create($attributes);
+            $skill = $attributes['skill'];
+            unset($attributes['skill']);
+            $data = Job::create($attributes);
+            //xử lý thêm skill
+            if ($skill && count($skill) > 0) {
+                foreach ($skill as $i) {
+                    $tmp = DB::table('skill_job_map')->insert([
+                        'job_id' => $data->id,
+                        'skill_id' => $i['skill_id'],
+                        'skill_points' => $i['point'],
+                    ]);
+                }
+            }
+
+            $data['skills'] = DB::table('skill_job_map')
+                ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
+                ->where('skill_job_map.job_id', '=', $data->id)
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+                ->get();;
+            return  $data;
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage(), null, 400);
+        }
+    }
+    public function updateWithData($id, $attributes = [])
+    {
+        try {
+            $skill = $attributes['skill'];
+            unset($attributes['skill']);
+            $data = Job::findOrFail($id);
+
+            // Cập nhật bản ghi Job với các thuộc tính mới
+            $data->update($attributes);
+            //xử lý thêm skill
+            if ($skill && count($skill) > 0) {
+                DB::table('skill_job_map')->where('job_id', $data->id)->delete();
+                foreach ($skill as $i) {
+                    $tmp = DB::table('skill_job_map')->insert([
+                        'job_id' => $data->id,
+                        'skill_id' => $i['skill_id'],
+                        'skill_points' => $i['point'],
+                    ]);
+                }
+            }
+
+            $data['skills'] = DB::table('skill_job_map')
+                ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
+                ->where('skill_job_map.job_id', '=', $data->id)
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+                ->get();;
+            return  $data;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
@@ -130,5 +180,16 @@ class JobService implements IJobService
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
+    }
+
+    public function getById($id)
+    {
+        $data = Job::find($id);
+        $data['skills'] = DB::table('skill_job_map')
+            ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
+            ->where('skill_job_map.job_id', '=', $data->id)
+            ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+            ->get();;
+        return  $data;
     }
 }

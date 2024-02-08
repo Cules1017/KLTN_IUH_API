@@ -50,6 +50,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::delete('{id}', [AdminController::class, 'destroy']);
                 }
             );
+           // Route::get('skill', [SkillController::class, 'index']);
             Route::group(
                 ['prefix' => 'skill', 'middleware' => ['isAdmin','exceptionGuest']],
                 function () {
@@ -119,10 +120,18 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 ['prefix' => 'job', 'middleware' => ['isClient']],
                 function () {
                     Route::get('/my-jobs', [JobController::class, 'getMyPost']);
-                    Route::post('update', [ClientController::class, 'updateForClient']);
-                    Route::get('', [ClientController::class, 'getInfoClient']);
+                    Route::post('/create-jobs', [JobController::class, 'createNewPost']);
+                    Route::post('/update-jobs/{id}', [JobController::class, 'updateForClient']);
+                    Route::delete('{id}', [JobController::class, 'destroy']);
                 }
             );
+           
+        }
+    );
+    Route::group(
+        ['prefix' => 'job','middleware' => 'checktoken'],
+        function () {
+            Route::get('/{id}', [JobController::class, 'getDetails']);
         }
     );
     Route::group(
