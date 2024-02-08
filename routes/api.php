@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\JobController;
@@ -122,6 +123,13 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::get('', [ClientController::class, 'getInfoClient']);
                 }
             );
+        }
+    );
+    Route::group(
+        ['prefix' => 'chat','middleware' => 'checktoken'], //
+        function () {
+            Route::post('new-chat', [ChatController::class, 'createNewRoomChat']);
+            Route::get('', [ChatController::class, 'getMyChat']);
         }
     );
 });
