@@ -189,7 +189,7 @@ class JobService implements IJobService
             ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
             ->where('skill_job_map.job_id', '=', $data->id)
             ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
-            ->get();;
+            ->get();
         return  $data;
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SystermConfigController;
+use App\Models\Freelancer;
 use App\Models\Job;
 use App\Models\Skill;
 use App\Services\JobService;
@@ -125,6 +126,20 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::delete('{id}', [JobController::class, 'destroy']);
                 }
             );
+           
+        }
+    );
+    Route::group(
+        ['prefix' => 'freelancer','middleware' => 'checktoken'], //
+        function () {
+            Route::group(
+                ['prefix' => 'info', 'middleware' => ['isFreelancer']],
+                function () {
+                    Route::post('update', [FreelancerController::class, 'updateForFreelancer']);
+                    Route::get('', [FreelancerController::class, 'getInfoUser']);
+                }
+            );
+           
            
         }
     );
