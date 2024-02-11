@@ -139,6 +139,13 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::get('', [FreelancerController::class, 'getInfoUser']);
                 }
             );
+            Route::group(
+                ['prefix' => 'job', 'middleware' => ['isFreelancer']],
+                function () {
+                    Route::post('update', [FreelancerController::class, 'updateForFreelancer']);
+                    Route::get('', [JobController::class, 'getJobListForFreelancer']);
+                }
+            );
            
            
         }

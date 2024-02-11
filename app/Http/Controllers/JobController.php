@@ -206,4 +206,10 @@ class JobController extends Controller
         $data = $this->jobService->updateWithData($id,array_merge($validator, ['thumbnail' => $imagePath,'skill'=>$skill,'min_proposals'=>$min_proposal]));
         return $this->sendOkResponse($data);
     }
+
+    public function getJobListForFreelancer(Request $request){
+        
+        $data=$this->jobService->getListJobForFreelancer($request->page,$request->num);
+        return $this->sendOkResponse($data);
+    }
 }

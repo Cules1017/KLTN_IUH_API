@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Job;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
@@ -192,4 +193,125 @@ class JobService implements IJobService
             ->get();
         return  $data;
     }
+
+//     public function getListJobForFreelancer($page=1,$perPage=10)
+// {
+//     global $user_info;
+//     $freelancerId = $user_info->id;
+    
+//     // Lấy danh sách các kỹ năng và điểm của freelancer
+//     $skills = DB::table('skill_freelancer_map')
+//         ->where('freelancer_id', $freelancerId)
+//         ->pluck('skill_id', 'skill_points')
+//         ->toArray();
+
+//     // Chuyển collection sang mảng
+//     $skillIds = array_keys($skills);
+
+//     // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
+//     $addedJobs = [];
+
+//     // Khởi tạo mảng để lưu các kỹ năng của các công việc
+//     $allSkills = [];
+    
+    
+//     $addedJobs = [];
+//     $orderByExpression = implode(',', $skillIds);
+// $jobs = DB::table('jobs')
+//     ->select('jobs.*')
+//     ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
+//     ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
+//     ->orderBy('skill_job_map.skill_points', 'DESC')
+//     ->orderByDesc('jobs.created_at')
+//     ->get();
+    
+//     $filteredJobs = collect([]);
+//     foreach ($jobs as $job) {
+//         ///lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
+//         if (!in_array($job->id, $addedJobs)) {
+//             $filteredJobs->push($job);
+//             $addedJobs[] = $job->id;
+//         }
+//     }
+    
+//     //$paginatedJobs = $filteredJobs->paginate(10);
+
+//     // Tạo một collection
+// $collection = collect($filteredJobs);
+
+
+// // Số trang hiện tại
+// //$page = LengthAwarePaginator::resolveCurrentPage();
+
+// // Tạo một slice của collection để hiển thị trên trang hiện tại
+// $currentPageItems = $collection->slice(($page - 1) * $perPage, $perPage)->all();
+
+// // Tạo đối tượng LengthAwarePaginator
+// $paginatedJobs= new LengthAwarePaginator($currentPageItems, $collection->count(), $perPage, $page);
+//     dd($paginatedJobs->items());
+//     // return [
+//     //     'data' => $data,
+//     //     'total' => $total,
+//     //     'total_page' => $totalPages,
+//     //     'num' => $num,
+//     //     'current_page' => $page,
+//     // ];
+// }
+public function getListJobForFreelancer($page = 1, $perPage = 10)
+{
+    $page=$page?$page:1;
+    $perPage=$perPage?$perPage:10;
+    global $user_info;
+    $freelancerId = $user_info->id;
+
+    // Lấy danh sách các kỹ năng và điểm của freelancer
+    $skills = DB::table('skill_freelancer_map')
+        ->where('freelancer_id', $freelancerId)
+        ->pluck('skill_id', 'skill_points')
+        ->toArray();
+
+    // Chuyển collection sang mảng
+    $skillIds = array_keys($skills);
+
+    // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
+    $addedJobs = [];
+
+    // Khởi tạo mảng để lưu các kỹ năng của các công việc
+    $allSkills = [];
+
+    $orderByExpression = implode(',', $skillIds);
+    $jobs = DB::table('jobs')
+        ->select('jobs.*')
+        ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
+        ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
+        //->orderBy('skill_job_map.skill_points', 'DESC')
+        ->orderByDesc('jobs.created_at')
+        ->get();
+
+    $filteredJobs = collect([]);
+    foreach ($jobs as $job) {
+        // Lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
+        if (!in_array($job->id, $addedJobs)) {
+            $filteredJobs->push($job);
+            $addedJobs[] = $job->id;
+        }
+    }
+
+    // Tạo đối tượng LengthAwarePaginator
+    $paginatedJobs = new LengthAwarePaginator(
+        $filteredJobs->forPage($page, $perPage), // Lấy trang hiện tại và số lượng trang trên mỗi trang
+        $filteredJobs->count(), // Tổng số mục
+        $perPage, // Số lượng mục trên mỗi trang
+        $page, // Trang hiện tại
+        ['path' => LengthAwarePaginator::resolveCurrentPath()] // Link đến trang
+    );
+    return [
+                'data' => $paginatedJobs->items(),
+                'total' => $paginatedJobs->total(),
+                'total_page' => $paginatedJobs->lastPage(),
+                'num' => $paginatedJobs->perPage(),
+                'current_page' => $paginatedJobs->currentPage(),
+            ];
+     //dd($paginatedJobs->items()); // Trả về mảng các mục trên trang hiện tại
+}
 }

@@ -43,10 +43,10 @@ class ChatController extends Controller
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
         $counts = DB::table('chat_rooms')
-            ->select('client_id', 'freelancer_id', DB::raw('COUNT(*) as count'))
-            ->groupBy('client_id', 'freelancer_id')
+            ->where('client_id','=', $rq['client_id'])
+            ->where('freelancer_id','=', $rq['freelancer_id'])
             ->get()->toArray();
-        if (count($counts) > 0 && $counts[0]->count > 0) {
+        if (count($counts) > 0) {
             return $this->sendBadRequestResponse("Phòng đã tồn tại");
         }
         $validator = $validator->validated();

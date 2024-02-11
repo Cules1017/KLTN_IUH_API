@@ -35,6 +35,9 @@ class CheckToken
         }
         global $user_info;
         $user_info=auth($apy['user_type'])->user();
+        if($user_info==null){
+            return $this->sendFailedResponse("Thông tin user không tồn tại vui lòng thử lại.",JsonResponse::HTTP_UNAUTHORIZED,  [], JsonResponse::HTTP_UNAUTHORIZED, null);
+        }
         $user_info['user_type']=$apy['user_type'];
 
         } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {

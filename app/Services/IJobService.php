@@ -11,4 +11,5 @@ interface IJobService
     public function getJobByAtribute(array $attributes, array $values,$page,$num);
     public function getById($id);
     public function updateWithData($id, $attributes = []);
+    public function getListJobForFreelancer($page=1,$perPage=10);
 }
