@@ -194,124 +194,254 @@ class JobService implements IJobService
         return  $data;
     }
 
-//     public function getListJobForFreelancer($page=1,$perPage=10)
-// {
-//     global $user_info;
-//     $freelancerId = $user_info->id;
-    
-//     // Lấy danh sách các kỹ năng và điểm của freelancer
-//     $skills = DB::table('skill_freelancer_map')
-//         ->where('freelancer_id', $freelancerId)
-//         ->pluck('skill_id', 'skill_points')
-//         ->toArray();
+    //     public function getListJobForFreelancer($page=1,$perPage=10)
+    // {
+    //     global $user_info;
+    //     $freelancerId = $user_info->id;
 
-//     // Chuyển collection sang mảng
-//     $skillIds = array_keys($skills);
+    //     // Lấy danh sách các kỹ năng và điểm của freelancer
+    //     $skills = DB::table('skill_freelancer_map')
+    //         ->where('freelancer_id', $freelancerId)
+    //         ->pluck('skill_id', 'skill_points')
+    //         ->toArray();
 
-//     // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
-//     $addedJobs = [];
+    //     // Chuyển collection sang mảng
+    //     $skillIds = array_keys($skills);
 
-//     // Khởi tạo mảng để lưu các kỹ năng của các công việc
-//     $allSkills = [];
-    
-    
-//     $addedJobs = [];
-//     $orderByExpression = implode(',', $skillIds);
-// $jobs = DB::table('jobs')
-//     ->select('jobs.*')
-//     ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
-//     ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
-//     ->orderBy('skill_job_map.skill_points', 'DESC')
-//     ->orderByDesc('jobs.created_at')
-//     ->get();
-    
-//     $filteredJobs = collect([]);
-//     foreach ($jobs as $job) {
-//         ///lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
-//         if (!in_array($job->id, $addedJobs)) {
-//             $filteredJobs->push($job);
-//             $addedJobs[] = $job->id;
-//         }
-//     }
-    
-//     //$paginatedJobs = $filteredJobs->paginate(10);
+    //     // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
+    //     $addedJobs = [];
 
-//     // Tạo một collection
-// $collection = collect($filteredJobs);
+    //     // Khởi tạo mảng để lưu các kỹ năng của các công việc
+    //     $allSkills = [];
 
 
-// // Số trang hiện tại
-// //$page = LengthAwarePaginator::resolveCurrentPage();
+    //     $addedJobs = [];
+    //     $orderByExpression = implode(',', $skillIds);
+    // $jobs = DB::table('jobs')
+    //     ->select('jobs.*')
+    //     ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
+    //     ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
+    //     ->orderBy('skill_job_map.skill_points', 'DESC')
+    //     ->orderByDesc('jobs.created_at')
+    //     ->get();
 
-// // Tạo một slice của collection để hiển thị trên trang hiện tại
-// $currentPageItems = $collection->slice(($page - 1) * $perPage, $perPage)->all();
+    //     $filteredJobs = collect([]);
+    //     foreach ($jobs as $job) {
+    //         ///lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
+    //         if (!in_array($job->id, $addedJobs)) {
+    //             $filteredJobs->push($job);
+    //             $addedJobs[] = $job->id;
+    //         }
+    //     }
 
-// // Tạo đối tượng LengthAwarePaginator
-// $paginatedJobs= new LengthAwarePaginator($currentPageItems, $collection->count(), $perPage, $page);
-//     dd($paginatedJobs->items());
-//     // return [
-//     //     'data' => $data,
-//     //     'total' => $total,
-//     //     'total_page' => $totalPages,
-//     //     'num' => $num,
-//     //     'current_page' => $page,
-//     // ];
-// }
-public function getListJobForFreelancer($page = 1, $perPage = 10)
-{
-    $page=$page?$page:1;
-    $perPage=$perPage?$perPage:10;
-    global $user_info;
-    $freelancerId = $user_info->id;
+    //     //$paginatedJobs = $filteredJobs->paginate(10);
 
-    // Lấy danh sách các kỹ năng và điểm của freelancer
-    $skills = DB::table('skill_freelancer_map')
-        ->where('freelancer_id', $freelancerId)
-        ->pluck('skill_id', 'skill_points')
-        ->toArray();
+    //     // Tạo một collection
+    // $collection = collect($filteredJobs);
 
-    // Chuyển collection sang mảng
-    $skillIds = array_keys($skills);
 
-    // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
-    $addedJobs = [];
+    // // Số trang hiện tại
+    // //$page = LengthAwarePaginator::resolveCurrentPage();
 
-    // Khởi tạo mảng để lưu các kỹ năng của các công việc
-    $allSkills = [];
+    // // Tạo một slice của collection để hiển thị trên trang hiện tại
+    // $currentPageItems = $collection->slice(($page - 1) * $perPage, $perPage)->all();
 
-    $orderByExpression = implode(',', $skillIds);
-    $jobs = DB::table('jobs')
-        ->select('jobs.*')
-        ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
-        ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
-        //->orderBy('skill_job_map.skill_points', 'DESC')
-        ->orderByDesc('jobs.created_at')
-        ->get();
+    // // Tạo đối tượng LengthAwarePaginator
+    // $paginatedJobs= new LengthAwarePaginator($currentPageItems, $collection->count(), $perPage, $page);
+    //     dd($paginatedJobs->items());
+    //     // return [
+    //     //     'data' => $data,
+    //     //     'total' => $total,
+    //     //     'total_page' => $totalPages,
+    //     //     'num' => $num,
+    //     //     'current_page' => $page,
+    //     // ];
+    // }
+    public function getListJobForFreelancer($page = 1, $perPage = 10)
+    {
+        $page = $page ? $page : 1;
+        $perPage = $perPage ? $perPage : 10;
+        global $user_info;
+        $freelancerId = $user_info->id;
 
-    $filteredJobs = collect([]);
-    foreach ($jobs as $job) {
-        // Lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
-        if (!in_array($job->id, $addedJobs)) {
-            $filteredJobs->push($job);
-            $addedJobs[] = $job->id;
+        // Lấy danh sách các kỹ năng và điểm của freelancer
+        $skills = DB::table('skill_freelancer_map')
+            ->where('freelancer_id', $freelancerId)
+            ->pluck('skill_id', 'skill_points')
+            ->toArray();
+
+        // Chuyển collection sang mảng
+        $skillIds = array_keys($skills);
+
+        // Khởi tạo mảng để lưu các công việc đã được thêm vào danh sách
+        $addedJobs = [];
+
+        // Khởi tạo mảng để lưu các kỹ năng của các công việc
+        $allSkills = [];
+
+        $orderByExpression = implode(',', $skillIds);
+        $jobs = DB::table('jobs')
+            ->select('jobs.*')
+            ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
+            ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
+            //->orderBy('skill_job_map.skill_points', 'DESC')
+            ->orderByDesc('jobs.created_at')
+            ->get();
+
+        $filteredJobs = collect([]);
+        foreach ($jobs as $job) {
+            // Lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
+            if (!in_array($job->id, $addedJobs)) {
+                $filteredJobs->push($job);
+                $addedJobs[] = $job->id;
+            }
         }
-    }
 
-    // Tạo đối tượng LengthAwarePaginator
-    $paginatedJobs = new LengthAwarePaginator(
-        $filteredJobs->forPage($page, $perPage), // Lấy trang hiện tại và số lượng trang trên mỗi trang
-        $filteredJobs->count(), // Tổng số mục
-        $perPage, // Số lượng mục trên mỗi trang
-        $page, // Trang hiện tại
-        ['path' => LengthAwarePaginator::resolveCurrentPath()] // Link đến trang
-    );
-    return [
-                'data' => $paginatedJobs->items(),
-                'total' => $paginatedJobs->total(),
-                'total_page' => $paginatedJobs->lastPage(),
-                'num' => $paginatedJobs->perPage(),
-                'current_page' => $paginatedJobs->currentPage(),
-            ];
-     //dd($paginatedJobs->items()); // Trả về mảng các mục trên trang hiện tại
-}
+        // Tạo đối tượng LengthAwarePaginator
+        $paginatedJobs = new LengthAwarePaginator(
+            $filteredJobs->forPage($page, $perPage), // Lấy trang hiện tại và số lượng trang trên mỗi trang
+            $filteredJobs->count(), // Tổng số mục
+            $perPage, // Số lượng mục trên mỗi trang
+            $page, // Trang hiện tại
+            ['path' => LengthAwarePaginator::resolveCurrentPath()] // Link đến trang
+        );
+        return [
+            'data' => $paginatedJobs->items(),
+            'total' => $paginatedJobs->total(),
+            'total_page' => $paginatedJobs->lastPage(),
+            'num' => $paginatedJobs->perPage(),
+            'current_page' => $paginatedJobs->currentPage(),
+        ];
+        //dd($paginatedJobs->items()); // Trả về mảng các mục trên trang hiện tại
+    }
+    // public function getListJobFillterForFreelancer($page = 1, $perPage = 10, $skillList = null, $keyword = null, $bids = null, $status = null, $proposal = null, $deadline = null)
+    // {
+    //     $query = Job::query();
+
+    //     // Áp dụng các bộ lọc nếu được truyền vào
+    //     if ($keyword) {
+    //         $query->where(function ($q) use ($keyword) {
+    //             $q->where('title', 'like', "%$keyword%")
+    //                 ->orWhere('desc', 'like', "%$keyword%")
+    //                 ->orWhere('content', 'like', "%$keyword%");
+    //         });
+    //     }
+
+    //     if ($bids) {
+    //         $bidsRange = explode(',', $bids);
+    //         if (count($bidsRange) === 2) {
+    //             $query->whereBetween('bids', [$bidsRange[0], $bidsRange[1]]);
+    //         }
+    //     }
+
+    //     if ($status) {
+    //         $query->where('status', $status);
+    //     }
+
+    //     if ($proposal) {
+    //         $proposalRange = explode(',', $proposal);
+    //         if (count($proposalRange) === 2) {
+    //             $query->whereBetween('min_proposals', [$proposalRange[0], $proposalRange[1]]);
+    //         }
+    //     }
+    //     // Xử lý trường skillList nếu có
+    //     if ($skillList) {
+    //         $skills = explode(',', $skillList);
+    //         $jobIds = DB::table('skill_job_map')->whereIn('skill_id', $skills)->pluck('job_id')->toArray();
+    //         $query->whereIn('id', $jobIds);
+    //     }
+
+    //     if ($deadline) {
+    //         $deadlineRange = explode(',', $deadline);
+    //         if (count($deadlineRange) === 2) {
+    //             $query->whereBetween('deadline', [$deadlineRange[0], $deadlineRange[1]]);
+    //         }
+    //     }
+
+    //     // Lấy tổng số lượng records
+    //     $total = $query->count();
+
+    //     // Phân trang
+    //     $data = $query->offset(($page - 1) * $perPage)
+    //         ->limit($perPage)
+    //         ->get();
+
+    //     $totalPage = ceil($total / $perPage);
+
+    //     return [
+    //         'data' => $data,
+    //         'total' => $total,
+    //         'total_page' => $totalPage,
+    //         'num' => $perPage,
+    //         'current_page' => $page,
+    //     ];
+    // }
+    public function getListJobFillterForFreelancer($page = 1, $perPage = 10, $skillList = null, $keyword = null, $bids = null, $status = null, $proposal = null, $deadline = null)
+    {
+        $page = $page ? $page : 1;
+        $perPage = $perPage ? $perPage : 10;
+        $query = Job::query();
+
+        // Áp dụng các bộ lọc nếu được truyền vào
+        if ($keyword) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%$keyword%")
+                    ->orWhere('desc', 'like', "%$keyword%")
+                    ->orWhere('content', 'like', "%$keyword%");
+            });
+        }
+
+        if ($bids) {
+            $bidsRange = explode(',', $bids);
+            if (count($bidsRange) === 2) {
+                $query->whereBetween('bids', [$bidsRange[0], $bidsRange[1]]);
+            }
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($proposal) {
+            $proposalRange = explode(',', $proposal);
+            if (count($proposalRange) === 2) {
+                $query->whereBetween('min_proposals', [$proposalRange[0], $proposalRange[1]]);
+            }
+        }
+
+        if ($skillList) {
+            $skills = explode(',', $skillList);
+            $jobIds = DB::table('skill_job_map')->whereIn('skill_id', $skills)->pluck('job_id')->toArray();
+            $query->whereIn('id', $jobIds);
+        }
+
+        if ($deadline) {
+            $deadlineRange = explode(',', $deadline);
+            if (count($deadlineRange) === 2) {
+                $query->whereBetween('deadline', [$deadlineRange[0], $deadlineRange[1]]);
+            }
+        }
+
+        // Lấy tổng số lượng records
+        $totalQuery = clone $query;
+        $total = $totalQuery->count();
+
+        $data = $query->limit($perPage);
+
+        if ($page > 1) {
+            $data = $data->offset(($page - 1) * $perPage);
+        }
+
+        $data = $data->get();
+
+        $totalPage = ceil($total / $perPage);
+
+        return [
+            'data' => $data,
+            'total' => $total,
+            'total_page' => $totalPage,
+            'num' => $perPage,
+            'current_page' => $page,
+        ];
+    }
 }

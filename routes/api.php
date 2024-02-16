@@ -144,6 +144,8 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 function () {
                     Route::post('update', [FreelancerController::class, 'updateForFreelancer']);
                     Route::get('', [JobController::class, 'getJobListForFreelancer']);
+                    Route::post('apply', [JobController::class, 'FreelancerApplyJob']);
+                    Route::get('applied', [JobController::class, 'getFreelancerAppliedJob']);
                 }
             );
            

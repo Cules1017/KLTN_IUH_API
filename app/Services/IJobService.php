@@ -12,4 +12,5 @@ interface IJobService
     public function getById($id);
     public function updateWithData($id, $attributes = []);
     public function getListJobForFreelancer($page=1,$perPage=10);
+    public function getListJobFillterForFreelancer($page=1,$perPage=10,$skillList = null,$keyword=null,$bids=null,$status=null,$proposal=null,$deadline=null);
 }
