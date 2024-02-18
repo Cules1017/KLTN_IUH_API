@@ -160,6 +160,7 @@ class JobController extends Controller
         ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
         ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
         ->get();
+        $data['applied_count']=count($data['applied']);
         $data['nominee']=CandidateApplyJob::where('job_id', $id) ->where('candidate_apply_job.status',">=", 2) ->orderBy('candidate_apply_job.proposal', 'desc')
         ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
         ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
@@ -385,5 +386,33 @@ class JobController extends Controller
         $task = Tasks::find($id);
         $task->destroy();
         return $this->sendOkResponse();
+    }
+    public function recruitmentConfirmation ($id,Request $request){
+        $infoApply=CandidateApplyJob::find($id);
+        if($infoApply==null)
+            return $this->sendFailedResponse("Không tìm thấy thông tin ứng tuyển với ID đã cung cấp", -1, "Không tìm thấy thông tin ứng tuyển với ID đã cung cấp", 422);
+        $ListApply=CandidateApplyJob::where('job_id',$infoApply->job_id)->where('status','>=',2)->get();
+        if(count($ListApply)>1){
+            foreach($ListApply as $apply){
+                $apply->status=1;
+                $apply->save();
+            }
+            return $this->sendFailedResponse("thông tin lỗi vui lòng thử lại.", -1, "thông tin lỗi vui lòng thử lại.", 422);
+        }
+        $ListApply=CandidateApplyJob::where('job_id',$infoApply->job_id)->get();
+        //dd($ListApply);
+        foreach($ListApply as $apply){
+            if($apply->id==$id){
+                
+                $apply->status=2;
+                $apply->save();
+            }
+            else{
+                $apply->status=-1;
+                $apply->save();
+            }
+        }
+        return $this->sendOkResponse("ok");
+
     }
 }

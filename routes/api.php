@@ -123,6 +123,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::post('/create-jobs', [JobController::class, 'createNewPost']);
                     Route::post('/update-jobs/{id}', [JobController::class, 'updateForClient']);
                     Route::delete('{id}', [JobController::class, 'destroy']);
+                    Route::post('/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
                 }
             );
         }
