@@ -152,8 +152,18 @@ class JobController extends Controller
 
     public function getDetails($id, Request $request)
     {
+        $status_arr= [0=>"ẩn",1=> "mở apply",2=>"đóng apply",3=>"đang được thực hiện" ];
         $data=$this->jobService->getById($id);
-        $data['tasks']=Tasks::where('job_id',"=",$id);
+        $data['status_text']=$status_arr[$data->status];
+        $data['tasks']=Tasks::where('job_id',"=",$id)->get();
+        $data['applied']=CandidateApplyJob::where('job_id', $id) ->orderBy('candidate_apply_job.proposal', 'desc')
+        ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
+        ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
+        ->get();
+        $data['nominee']=CandidateApplyJob::where('job_id', $id) ->where('candidate_apply_job.status',">=", 2) ->orderBy('candidate_apply_job.proposal', 'desc')
+        ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
+        ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
+        ->first();
         return $this->sendOkResponse($data);
     }
 
