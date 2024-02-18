@@ -7,6 +7,7 @@ use App\Helpers\MyHelper;
 use App\Models\CandidateApplyJob;
 use App\Models\Freelancer;
 use App\Models\Job;
+use App\Models\Tasks;
 use App\Services\IAdminService;
 use App\Services\IJobService;
 use App\Services\ISystermConfigService;
@@ -151,7 +152,9 @@ class JobController extends Controller
 
     public function getDetails($id, Request $request)
     {
-        return $this->jobService->getById($id);
+        $data=$this->jobService->getById($id);
+        $data['tasks']=Tasks::where('job_id',"=",$id);
+        return $this->sendOkResponse($data);
     }
 
     public function destroy($id)
@@ -316,5 +319,61 @@ class JobController extends Controller
             $job->status_apply_text= $status;
         }
         return $this->sendOkResponse($appliedJobs);
+    }
+    public function getTaskByJob($id,Request $request){
+        $data=Tasks::where('job_id',"=",$id);
+        return $this->sendOkResponse($data);
+    }
+    public function addTask($id, Request $request){
+        $rq = MyHelper::convertKeysToSnakeCase(array_merge($request->all(),['job_id'=>$id]));
+        // Validation rules
+        $rules = [
+            'job_id' => ['required', 'integer', 'exists:jobs,id'],
+            'name' => ['required', 'string'],
+            'desc'=> ['required', 'string'],
+            'deadline' => ['required', 'string']
+        ];
+
+        // Custom error messages
+        $messages = [
+            'required' => 'Trường :attribute là bắt buộc.',
+            'exists' => 'Trường :attribute không tồn tại trong bảng :table.',
+            'string' => 'Trường :attribute phải là chuỗi.',
+            'max' => 'Trường :attribute không được vượt quá :max ký tự.',
+            'numeric' => 'Trường :attribute phải là số.',
+            'integer' => 'Trường :attribute phải là số nguyên.',
+            'min' => 'Trường :attribute phải lớn hơn hoặc bằng :min.',
+            'date' => 'Trường :attribute phải là ngày hợp lệ.',
+        ];
+        $validator = Validator::make($rq, $rules, $messages);
+
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        }
+
+        $validator = $validator->validated(); 
+        $data=Tasks::create(array_merge($validator,['status'=>-1,'confirm_status'=>-1]));
+        return $this->sendOkResponse($data);
+    }
+
+    public function freelancerSetStatus($id,Request $request){
+        $task = Tasks::find($id);
+        $task->status = $request->status;
+        $task->save();
+        return $this->sendOkResponse($task);
+    }
+    public function clientConfirmStatus($id,Request $request){
+        $task = Tasks::find($id);
+        $task->confirm_status = $request->confirm_status;
+        if($request->confirm_status==0)
+            $task->status =0;
+        $task->save();
+        return $this->sendOkResponse($task);
+    }
+
+    public function destroyTask($id,Request $request){
+        $task = Tasks::find($id);
+        $task->destroy();
+        return $this->sendOkResponse();
     }
 }

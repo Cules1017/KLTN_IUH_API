@@ -39,11 +39,11 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
         }
     );
     Route::group(
-        ['prefix' => 'administrator','middleware' => 'checktoken'], //
+        ['prefix' => 'administrator', 'middleware' => 'checktoken'], //
         function () {
             Route::get('/test', 'AuthController@login')->name('login');
             Route::group(
-                ['prefix' => 'manager', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'manager', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [AdminController::class, 'index']);
                     Route::post('', [AdminController::class, 'store']);
@@ -51,9 +51,9 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::delete('{id}', [AdminController::class, 'destroy']);
                 }
             );
-           // Route::get('skill', [SkillController::class, 'index']);
+            // Route::get('skill', [SkillController::class, 'index']);
             Route::group(
-                ['prefix' => 'skill', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'skill', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [SkillController::class, 'index']);
                     Route::post('', [SkillController::class, 'store']);
@@ -62,7 +62,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 }
             );
             Route::group(
-                ['prefix' => 'client', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'client', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [ClientController::class, 'index']);
                     //Route::post('', [ClientController::class, 'store']);
@@ -71,7 +71,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 }
             );
             Route::group(
-                ['prefix' => 'freelancer', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'freelancer', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [FreelancerController::class, 'index']);
                     //Route::post('', [ClientController::class, 'store']);
@@ -80,7 +80,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 }
             );
             Route::group(
-                ['prefix' => 'systerm-config', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'systerm-config', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [SystermConfigController::class, 'index']);
                     Route::post('', [SystermConfigController::class, 'store']);
@@ -89,24 +89,23 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 }
             );
             Route::group(
-                ['prefix' => 'report', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'report', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [ReportController::class, 'index']);
                     Route::put('resolve/{id}', [ReportController::class, 'updateAdmin']);
                 }
             );
             Route::group(
-                ['prefix' => 'post', 'middleware' => ['isAdmin','exceptionGuest']],
+                ['prefix' => 'post', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [ReportController::class, 'index']);
                     Route::put('resolve/{id}', [ReportController::class, 'updateAdmin']);
                 }
             );
-            
         }
     );
     Route::group(
-        ['prefix' => 'client','middleware' => 'checktoken'], //
+        ['prefix' => 'client', 'middleware' => 'checktoken'], //
         function () {
             Route::group(
                 ['prefix' => 'info', 'middleware' => ['isClient']],
@@ -126,11 +125,10 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::delete('{id}', [JobController::class, 'destroy']);
                 }
             );
-           
         }
     );
     Route::group(
-        ['prefix' => 'freelancer','middleware' => 'checktoken'], //
+        ['prefix' => 'freelancer', 'middleware' => 'checktoken'], //
         function () {
             Route::group(
                 ['prefix' => 'info', 'middleware' => ['isFreelancer']],
@@ -148,21 +146,26 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::get('applied', [JobController::class, 'getFreelancerAppliedJob']);
                 }
             );
-           
-           
         }
     );
     Route::group(
-        ['prefix' => 'job','middleware' => 'checktoken'],
+        ['prefix' => 'job', 'middleware' => 'checktoken'],
         function () {
             Route::get('/{id}', [JobController::class, 'getDetails']);
+            Route::get('/{id}/task', [JobController::class, 'getTaskByJob']);
+            Route::post('/{id}/new-task', [JobController::class, 'addTask']);
+            Route::post('/task/{id}/set-status', [JobController::class, 'freelancerSetStatus'])->middleware('isFreelancer');
+            Route::post('/task/{id}/confirm-status', [JobController::class, 'clientConfirmStatus'])->middleware('isClient');
+            Route::delete('/task/{id}', [JobController::class, 'destroyTask']);
         }
     );
     Route::group(
-        ['prefix' => 'chat','middleware' => 'checktoken'], //
+        ['prefix' => 'chat', 'middleware' => 'checktoken'], //
         function () {
             Route::post('new-chat', [ChatController::class, 'createNewRoomChat']);
             Route::get('', [ChatController::class, 'getMyChat']);
+            Route::get('messages/{roomId}', [ChatController::class, 'getMessagesByRoomId']);
+            Route::post('send-message', [ChatController::class, 'sendMessage']);
         }
     );
 });
