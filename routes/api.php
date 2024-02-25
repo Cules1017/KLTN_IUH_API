@@ -6,6 +6,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SystermConfigController;
@@ -126,6 +127,17 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::post('/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
                 }
             );
+            Route::group(
+                ['prefix' => 'freelancers', 'middleware' => ['isClient']],
+                function () {
+                    Route::get('/', [ClientController::class, 'getListFreelancer']);
+                    Route::post('/invite', [ClientController::class, 'inviteJob']);
+                    Route::post('/create-jobs', [JobController::class, 'createNewPost']);
+                    Route::post('/update-jobs/{id}', [JobController::class, 'updateForClient']);
+                    Route::delete('{id}', [JobController::class, 'destroy']);
+                    Route::post('/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
+                }
+            );
         }
     );
     Route::group(
@@ -158,6 +170,14 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::post('/task/{id}/set-status', [JobController::class, 'freelancerSetStatus'])->middleware('isFreelancer');
             Route::post('/task/{id}/confirm-status', [JobController::class, 'clientConfirmStatus'])->middleware('isClient');
             Route::delete('/task/{id}', [JobController::class, 'destroyTask']);
+        }
+    );
+    Route::group(
+        ['prefix' => 'notifications', 'middleware' => 'checktoken'], //
+        function () {
+            Route::get('', [NotificationController::class, 'index']);
+            Route::post('', [NotificationController::class, 'store']);
+            Route::put('/{id}', [NotificationController::class, 'update']);
         }
     );
     Route::group(

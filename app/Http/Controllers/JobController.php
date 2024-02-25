@@ -145,7 +145,7 @@ class JobController extends Controller
         if ($page && $num) {
             $data = $this->jobService->getJobByAtribute($atributes, $value, $page, $num);
         } else {
-            $data = $this->jobService->getJobByAtribute($atributes, $value);
+            $data = $this->jobService->getJobByAtribute($atributes, $value,1,100000);
         }
         return $this->sendOkResponse($data);
     }
