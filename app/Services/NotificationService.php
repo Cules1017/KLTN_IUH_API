@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\NewNotiEvent;
 use App\Models\Notifications;
 use Exception;
 use Illuminate\Support\Facades\Mail;
@@ -29,7 +30,10 @@ class NotificationService implements INotificationService
                     $message->to($user_info->email, $user_info->first_name)->subject($attributes['title']);
                 });
             }
-            return Notifications::create(array_merge(["user_id"=>$user_info->id,"noti_type"=>0,"type_user"=>$user_info->user_type,"is_read"=>0,"time_push"=>now()],$attributes) );
+            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"noti_type"=>0,"type_user"=>$user_info->user_type,"is_read"=>0,"time_push"=>now()],$attributes) );
+            //$listNoti=Notifications::where('user_id','=',$user_info->id)->where('type_user','=',$user_info->user_type)->get()->toArray();
+            event(new NewNotiEvent($newNoti,$user_info->id,$user_info->user_type));
+            return $newNoti;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
@@ -49,6 +53,22 @@ class NotificationService implements INotificationService
             $admin=Notifications::findOrFail($id);
             $admin->destroy();
             return $admin;
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage(), null, 400);
+        }
+    }
+    public function pushNotitoUser($user_info,$attributes = [],$sendMail=false)
+    {
+        try {
+            if($sendMail){
+                Mail::send('mailnoti', ['title' => $attributes['title'],'message_mail'=>$attributes['message']], function ($message) use ($user_info,$attributes) {
+                    $message->to($user_info->email, $user_info->first_name)->subject($attributes['title']);
+                });
+            }
+            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"noti_type"=>0,"type_user"=>$user_info->user_type,"is_read"=>0,"time_push"=>now()],$attributes) );
+            //$listNoti=Notifications::where('user_id','=',$user_info->id)->where('type_user','=',$user_info->user_type)->get()->toArray();
+            event(new NewNotiEvent($newNoti,$user_info->id,$user_info->user_type));
+            return $newNoti;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }

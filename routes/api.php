@@ -10,6 +10,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SystermConfigController;
+use App\Http\Controllers\TaskController;
 use App\Models\Freelancer;
 use App\Models\Job;
 use App\Models\Skill;
@@ -169,7 +170,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::post('/{id}/new-task', [JobController::class, 'addTask']);
             Route::post('/task/{id}/set-status', [JobController::class, 'freelancerSetStatus'])->middleware('isFreelancer');
             Route::post('/task/{id}/confirm-status', [JobController::class, 'clientConfirmStatus'])->middleware('isClient');
-            Route::delete('/task/{id}', [JobController::class, 'destroyTask']);
+            Route::delete('/task/{id}', [JobController::class, 'destroyTask'])->middleware('isClient');
         }
     );
     Route::group(
@@ -189,4 +190,5 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::post('send-message', [ChatController::class, 'sendMessage']);
         }
     );
+ 
 });

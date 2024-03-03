@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Helpers\FileHelper;
 use App\Helpers\MyHelper;
 use App\Models\CandidateApplyJob;
+use App\Models\Client;
 use App\Models\Freelancer;
 use App\Models\Job;
 use App\Models\Tasks;
 use App\Services\IAdminService;
 use App\Services\IJobService;
+use App\Services\INotificationService;
 use App\Services\ISystermConfigService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -22,9 +24,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class JobController extends Controller
 {
     public $jobService;
-    public function __construct(IJobService $jobService)
+    public $notiService;
+    public function __construct(IJobService $jobService, INotificationService $notiService)
     {
         $this->jobService = $jobService;
+        $this->notiService=$notiService;
     }
     public function index(Request $request)
     {
@@ -145,26 +149,26 @@ class JobController extends Controller
         if ($page && $num) {
             $data = $this->jobService->getJobByAtribute($atributes, $value, $page, $num);
         } else {
-            $data = $this->jobService->getJobByAtribute($atributes, $value,1,100000);
+            $data = $this->jobService->getJobByAtribute($atributes, $value, 1, 100000);
         }
         return $this->sendOkResponse($data);
     }
 
     public function getDetails($id, Request $request)
     {
-        $status_arr= [0=>"ẩn",1=> "mở apply",2=>"đóng apply",3=>"đang được thực hiện" ];
-        $data=$this->jobService->getById($id);
-        $data['status_text']=$status_arr[$data->status];
-        $data['tasks']=Tasks::where('job_id',"=",$id)->get();
-        $data['applied']=CandidateApplyJob::where('job_id', $id) ->orderBy('candidate_apply_job.proposal', 'desc')
-        ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
-        ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
-        ->get();
-        $data['applied_count']=count($data['applied']);
-        $data['nominee']=CandidateApplyJob::where('job_id', $id) ->where('candidate_apply_job.status',">=", 2) ->orderBy('candidate_apply_job.proposal', 'desc')
-        ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
-        ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
-        ->first();
+        $status_arr = [0 => "ẩn", 1 => "mở apply", 2 => "đóng apply", 3 => "đang được thực hiện"];
+        $data = $this->jobService->getById($id);
+        $data['status_text'] = $status_arr[$data->status];
+        $data['tasks'] = Tasks::where('job_id', "=", $id)->get();
+        $data['applied'] = CandidateApplyJob::where('job_id', $id)->orderBy('candidate_apply_job.proposal', 'desc')
+            ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
+            ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
+            ->get();
+        $data['applied_count'] = count($data['applied']);
+        $data['nominee'] = CandidateApplyJob::where('job_id', $id)->where('candidate_apply_job.status', ">=", 2)->orderBy('candidate_apply_job.proposal', 'desc')
+            ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
+            ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
+            ->first();
         return $this->sendOkResponse($data);
     }
 
@@ -251,6 +255,7 @@ class JobController extends Controller
         $rules = [
             'job_id' => ['required', 'integer', 'exists:jobs,id'],
             'proposal' => ['required', 'numeric'],
+            'contract_id'=>['required', 'numeric'],
         ];
 
         // Custom error messages
@@ -276,8 +281,8 @@ class JobController extends Controller
             return $this->sendFailedResponse("Công việc đang ở trạng thái không thể apply.", -1, "Công việc đang ở trạng thái không thể apply.", 422);
         if ($validator['proposal'] < $jobInfo->min_proposals)
             return $this->sendFailedResponse("Vui lòng nhập proposal lớn hơn giá trị min.", -1, "Vui lòng nhập proposal lớn hơn giá trị min.", 422);
-        if ($validator['proposal'] > $freelancer->available_proposal)
-            return $this->sendFailedResponse("Không đủ proposal để apply.", -1, "Không đủ proposal để apply.", 422);
+        // if ($validator['proposal'] > $freelancer->available_proposal)
+        //     return $this->sendFailedResponse("Không đủ proposal để apply.", -1, "Không đủ proposal để apply.", 422);
         $cvUrl = $request->cvUrl ? $request->cvUrl : '';
         if ($request->hasFile('cvUrl')) {
             $cvUrl = FileHelper::saveImage($request->file('cvUrl'), 'cv_freelancer', 'CV');
@@ -288,6 +293,7 @@ class JobController extends Controller
             'job_id' => $validator['job_id'],
             'proposal' => $validator['proposal'],
             'cv_url' => $cvUrl,
+            'contract_id'=>$validator['contract_id'],
         ]);
         $freelancer->available_proposal = $freelancer->available_proposal - $validator['proposal'];
         $freelancer->save();
@@ -307,7 +313,7 @@ class JobController extends Controller
             ->select('candidate_apply_job.status as job_ap_status', 'candidate_apply_job.cv_url', 'jobs.*')
             ->get();
         foreach ($appliedJobs as &$job) {
-            $status='';
+            $status = '';
             switch ($job->job_ap_status) {
                 case 1:
                     $status = 'Đã apply';
@@ -327,21 +333,36 @@ class JobController extends Controller
                 default:
                     $status = 'Không xác định';
             }
-            $job->status_apply_text= $status;
+            $job->status_apply_text = $status;
         }
         return $this->sendOkResponse($appliedJobs);
     }
-    public function getTaskByJob($id,Request $request){
-        $data=Tasks::where('job_id',"=",$id);
-        return $this->sendOkResponse($data);
+    public function getTaskByJob($id, Request $request)
+    {
+        try {
+            $JobInfo = Job::findorFail($id);
+            $data = Tasks::where('job_id', '=', $id)->get();
+            $mappingText1 = ["-1" => "Đã được giao", "0" => "Đang thực hiện", "1" => "Đã hoàn thành"];
+            $mappingText2 = ["0" => "Chưa xác nhận", "1" => "Đã xác nhận"];
+            foreach ($data as $key => $value) {
+                // Thêm các trường vào mảng $data
+                $data[$key]['status_text'] = $mappingText1[$value['status']];
+                $data[$key]['status_confirm_text'] = $mappingText2[$value['confirm_status']];
+                // và các trường khác nếu cần
+            }
+            return $this->sendOkResponse($data);
+        } catch (\Throwable $th) {
+            return $this->sendFailedResponse("Có lỗi khi lấy task vui lòng thử lại! Hãy chắc chắn là job tồn tại");
+        }
     }
-    public function addTask($id, Request $request){
-        $rq = MyHelper::convertKeysToSnakeCase(array_merge($request->all(),['job_id'=>$id]));
+    public function addTask($id, Request $request)
+    {
+        $rq = MyHelper::convertKeysToSnakeCase(array_merge($request->all(), ['job_id' => $id]));
         // Validation rules
         $rules = [
             'job_id' => ['required', 'integer', 'exists:jobs,id'],
             'name' => ['required', 'string'],
-            'desc'=> ['required', 'string'],
+            'desc' => ['required', 'string'],
             'deadline' => ['required', 'string']
         ];
 
@@ -362,57 +383,80 @@ class JobController extends Controller
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
 
-        $validator = $validator->validated(); 
-        $data=Tasks::create(array_merge($validator,['status'=>-1,'confirm_status'=>-1]));
-        return $this->sendOkResponse($data);
+        $validator = $validator->validated();
+        try {
+            $JobInfo = Job::findorFail($id);
+            $data = Tasks::create(array_merge($validator, ['status' => -1, 'confirm_status' => 0]));
+            $infoApply = CandidateApplyJob::where('job_id', $id)->where('status',2)->first();
+            if($infoApply==null){
+                return $this->sendBadRequestResponse("Công việc chưa có người thực hiện");
+            }
+            $user_info=Freelancer::find($infoApply->freelancer_id);
+            $user_info['user_type']='freelancer';
+            $this->notiService->pushNotitoUser($user_info,['linkable'=>'hahaha','image'=>'https://d57439wlqx3vo.cloudfront.net/iblock/f5d/f5dcf76697107ea302a1981718e33c95/1f68f84b53199df9cae4b253225eae63.png','title'=>"[$JobInfo->title] Thêm Công Việc Mới",'message'=>"$data->name $data->desc"],true);
+            return $this->sendOkResponse($data);
+        } catch (\Throwable $th) {
+            return $this->sendFailedResponse("Có lỗi khi lấy task vui lòng thử lại! Hãy chắc chắn là job tồn tại");
+        }
     }
 
-    public function freelancerSetStatus($id,Request $request){
+    public function freelancerSetStatus($id, Request $request)
+    {
+        global $user_info;
         $task = Tasks::find($id);
         $task->status = $request->status;
         $task->save();
+        $Job=Job::find($task->job_id);
+        $user_info1=Client::find($Job->client_id);
+        $user_info1['user_type']='client';
+        $this->notiService->pushNotitoUser($user_info1,['linkable'=>'hahaha','image'=>'https://d57439wlqx3vo.cloudfront.net/iblock/f5d/f5dcf76697107ea302a1981718e33c95/1f68f84b53199df9cae4b253225eae63.png','title'=>"$user_info->first_name Đã set Status công việc",'message'=>"aaaaa"],true);
+
         return $this->sendOkResponse($task);
     }
-    public function clientConfirmStatus($id,Request $request){
+    public function clientConfirmStatus($id, Request $request)
+    {
         $task = Tasks::find($id);
         $task->confirm_status = $request->confirm_status;
-        if($request->confirm_status==0)
-            $task->status =0;
+        if ($request->confirm_status == 0)
+            $task->status = 0;
         $task->save();
         return $this->sendOkResponse($task);
     }
 
-    public function destroyTask($id,Request $request){
+    public function destroyTask($id, Request $request)
+    {
         $task = Tasks::find($id);
         $task->destroy();
         return $this->sendOkResponse();
     }
-    public function recruitmentConfirmation ($id,Request $request){
-        $infoApply=CandidateApplyJob::find($id);
-        if($infoApply==null)
+    public function recruitmentConfirmation($id, Request $request)
+    {
+        $infoApply = CandidateApplyJob::find($id);
+        if ($infoApply == null)
             return $this->sendFailedResponse("Không tìm thấy thông tin ứng tuyển với ID đã cung cấp", -1, "Không tìm thấy thông tin ứng tuyển với ID đã cung cấp", 422);
-        $ListApply=CandidateApplyJob::where('job_id',$infoApply->job_id)->where('status','>=',2)->get();
-        if(count($ListApply)>1){
-            foreach($ListApply as $apply){
-                $apply->status=1;
+        $ListApply = CandidateApplyJob::where('job_id', $infoApply->job_id)->where('status', '>=', 2)->get();
+        if (count($ListApply) > 1) {
+            foreach ($ListApply as $apply) {
+                $apply->status = 1;
                 $apply->save();
             }
             return $this->sendFailedResponse("thông tin lỗi vui lòng thử lại.", -1, "thông tin lỗi vui lòng thử lại.", 422);
         }
-        $ListApply=CandidateApplyJob::where('job_id',$infoApply->job_id)->get();
+        $ListApply = CandidateApplyJob::where('job_id', $infoApply->job_id)->get();
+        $Job = Job::find($infoApply->job_id);
+        $Job->status = 2;
+        $Job->save();
         //dd($ListApply);
-        foreach($ListApply as $apply){
-            if($apply->id==$id){
-                
-                $apply->status=2;
+        foreach ($ListApply as $apply) {
+            if ($apply->id == $id) {
+
+                $apply->status = 2;
                 $apply->save();
-            }
-            else{
-                $apply->status=-1;
+            } else {
+                $apply->status = -1;
                 $apply->save();
             }
         }
         return $this->sendOkResponse("ok");
-
     }
 }

@@ -8,4 +8,5 @@ interface INotificationService
     public function createNoti($attributes = [],$sendMail);
     public function updateAtribute($id,$attribute);
     public function destroy($id);
+    public function pushNotitoUser($user_info,$attributes = [],$sendMail=false);
 }
