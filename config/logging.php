@@ -89,7 +89,7 @@ return [
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
         ],
@@ -126,6 +126,29 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'custom_error' => [
+            'driver' => 'single',
+            'level'  => env('LOG_LEVEL', 'debug'),
+            'path'   => storage_path('logs/errors-' . (new \DateTime)->format('Y-m-d-H') . '.log'),
+            // 'days' =>env('LOG_DAILY_DAYS', 30),
+            'bubble' => false
+        ],
+        'custom_info' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/info-' . (new \DateTime)->format('Y-m-d-H') . '.log'),
+            'level' => 'info',
+            // 'days' =>env('LOG_DAILY_DAYS', 30),
+            'bubble' => false,
+        ],
+        'custom_api_timeout' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/api-timeout-' . (new \DateTime)->format('Y-m-d-H') . '.log'),
+            'level' => 'notice',
+            // 'days' =>env('LOG_DAILY_DAYS', 30),
+            'bubble' => false,
+        ],
+
     ],
 
 ];

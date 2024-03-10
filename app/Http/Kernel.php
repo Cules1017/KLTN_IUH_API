@@ -71,6 +71,7 @@ class Kernel extends HttpKernel
         'isAdmin' => \App\Http\Middleware\IsAdmin::class,
         'isClient' => \App\Http\Middleware\IsClient::class,
         'isFreelancer' => \App\Http\Middleware\IsFreelancer::class,
-        'exceptionGuest' => \App\Http\Middleware\CheckParner::class
+        'exceptionGuest' => \App\Http\Middleware\CheckParner::class,
+        'logmd'=>\App\Http\Middleware\HandleLoggingMiddleware::class
     ];
 }

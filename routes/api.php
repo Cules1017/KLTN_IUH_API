@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Controllers'], function () {
+Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Controllers','middleware' => ['logmd']], function () {
     Route::group(
         ['middleware' => ['api']],
         function () {
