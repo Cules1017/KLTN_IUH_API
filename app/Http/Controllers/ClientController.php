@@ -86,8 +86,6 @@ class ClientController extends Controller
             'avatar_url' => 'nullable|string',
             'company_name' => 'nullable|string',
             'introduce' => 'nullable|string',
-            'bank_account' => 'nullable|exists:bank_accounts,id',
-            'is_completed_profile'=>'nullable'
         ];
 
         // Custom error messages
@@ -145,15 +143,15 @@ class ClientController extends Controller
             // lấy thông tin job của user hiện tại và lấy các kỹ năng liên quan và đưa ra danh sách cá freelancer có kỹ năng liên quan
             $data = $this->freelancerService->autoGetFreelancer($page,$num);
         }
-        if ( !$request->keyword == null || !$request->skills == null || !$request->majors == null || !$request->date_of_birth == null||!$request->expected_salary == null||!$request->sex == null) {
+        if ( !$request->keyword == null || !$request->skills == null || !$request->majors == null || !$request->date_of_birth == null||!$request->sex == null) {
             // thực hiện lấy list theo search
             //keyword là search dựa trên các trường intro, address
             //sskill là list skills ex:skills=1,2,3,45,21. search theo id các freelancer có cái skill này bảng skill_freelancer_map
             //expected_salary search dưa trên mức lương mong đợi input là khoảng giá trị cách nhau dấu , expected_salary=1,100
             // sex giá trị 1 là nam 2 là nữ
-            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->expected_salary, $request->sex);
+            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->sex);
         } else {
-            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->expected_salary, $request->sex);
+            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->sex);
         }
         return $this->sendOkResponse($data);
     }
@@ -201,7 +199,6 @@ class ClientController extends Controller
         $candidateApplyJob = CandidateApplyJob::create([
             'freelancer_id' => $validator['freelancer_id'],
             'job_id' => $validator['job_id'],
-            'proposal' => 0,
             'attachment_url' => '',
             'cover_letter'=>'',
             'status'=>2

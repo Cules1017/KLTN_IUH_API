@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Admin;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Job;
 use App\Models\Skill;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -78,8 +79,7 @@ class FreelancerService implements IFreelancerService
                 foreach ($skill as $i) {
                     $tmp = DB::table('skill_freelancer_map')->insert([
                         'freelancer_id' => $admin->id,
-                        'skill_id' => $i['skill_id'],
-                        'skill_points' => $i['point'],
+                        'skill_id' => $i
                     ]);
                 }
             }
@@ -100,7 +100,7 @@ class FreelancerService implements IFreelancerService
             $result['skills'] = DB::table('skill_freelancer_map')
                 ->join('skills', 'skill_freelancer_map.skill_id', '=', 'skills.id')
                 ->where('skill_freelancer_map.freelancer_id', '=', $admin->id)
-                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_freelancer_map.skill_points')
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name')
                 ->get();
             $result['majors'] = DB::table('major_freelancer_map')
                 ->join('majors', 'major_freelancer_map.major_id', '=', 'majors.id')
@@ -131,7 +131,7 @@ class FreelancerService implements IFreelancerService
             $admin['skills'] = DB::table('skill_freelancer_map')
                 ->join('skills', 'skill_freelancer_map.skill_id', '=', 'skills.id')
                 ->where('skill_freelancer_map.freelancer_id', '=', $admin->id)
-                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_freelancer_map.skill_points')
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name')
                 ->get();
             $admin['majors'] = DB::table('major_freelancer_map')
                 ->join('majors', 'major_freelancer_map.major_id', '=', 'majors.id')
@@ -180,7 +180,7 @@ class FreelancerService implements IFreelancerService
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
     }
-    public function searchListFreelancer($page, $num, $keyword, $skills,$majors, $date_of_birth, $expected_salary, $sex)
+    public function searchListFreelancer($page, $num, $keyword, $skills,$majors, $date_of_birth, $sex)
     {
         try {
             // Bắt đầu truy vấn
@@ -214,12 +214,6 @@ class FreelancerService implements IFreelancerService
                 if (count($deadlineRange) === 2) {
                     $query->whereBetween('date_of_birth', [$deadlineRange[0], $deadlineRange[1]]);
                 }
-            }
-
-            // Tìm kiếm theo mức lương mong đợi
-            if (!empty($expected_salary)) {
-                $salaries = explode(',', $expected_salary);
-                $query->whereBetween('expected_salary', $salaries);
             }
 
             // Tìm kiếm theo giới tính

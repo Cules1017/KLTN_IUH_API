@@ -68,7 +68,7 @@ class JobService implements IJobService
         }
     }
 
-    public function getList($num = 10, $page = 1, $searchKeyword = '', $client_info, $min_proposal, $id, $bids, $status)
+    public function getList($num = 10, $page = 1, $searchKeyword = '', $client_info, $id, $bids, $status)
     {
         try {
             // Xây dựng query Eloquent
@@ -83,9 +83,6 @@ class JobService implements IJobService
             if ($client_info !== null) {
                 $query->where('username', 'like', '%' . $client_info . '%')
                     ->orWhere('email', 'like', '%' . $client_info . '%');
-            }
-            if ($min_proposal !== null) {
-                $query->where('min_proposal', '>=', $min_proposal);
             }
             if ($status !== null) {
                 $query->where('status', '=', $status);
@@ -189,7 +186,7 @@ class JobService implements IJobService
         $data['skills'] = DB::table('skill_job_map')
             ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
             ->where('skill_job_map.job_id', '=', $data->id)
-            ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+            ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name')
             ->get();
         return  $data;
     }
@@ -267,7 +264,7 @@ class JobService implements IJobService
         // Lấy danh sách các kỹ năng và điểm của freelancer
         $skills = DB::table('skill_freelancer_map')
             ->where('freelancer_id', $freelancerId)
-            ->pluck('skill_id', 'skill_points')
+            ->pluck('skill_id')
             ->toArray();
 
         // Chuyển collection sang mảng
@@ -382,7 +379,7 @@ class JobService implements IJobService
     //         'current_page' => $page,
     //     ];
     // }
-    public function getListJobFillterForFreelancer($page = 1, $perPage = 10, $skillList = null, $keyword = null, $bids = null, $status = null, $proposal = null, $deadline = null)
+    public function getListJobFillterForFreelancer($page = 1, $perPage = 10, $skillList = null, $keyword = null, $bids = null, $status = null, $deadline = null)
     {
         $page = $page ? $page : 1;
         $perPage = $perPage ? $perPage : 10;
@@ -405,13 +402,6 @@ class JobService implements IJobService
 
         if (isset($status)) {
             $query->where('status', $status);
-        }
-
-        if ($proposal) {
-            $proposalRange = explode(',', $proposal);
-            if (count($proposalRange) === 2) {
-                $query->whereBetween('min_proposals', [$proposalRange[0], $proposalRange[1]]);
-            }
         }
 
         if ($skillList) {

@@ -90,10 +90,7 @@ class FreelancerController extends Controller
             'sex' => 'nullable|integer',
             'date_of_birth' => 'nullable|date',
             'avatar_url' => 'nullable|string',
-            'expected_salary' => 'nullable|float',
             'intro' => 'nullable|string',
-            'bank_account' => 'nullable|exists:bank_accounts,id',
-            'is_completed_profile'=>'nullable|integer'
         ];
 
         // Custom error messages
@@ -112,7 +109,7 @@ class FreelancerController extends Controller
         if ($request->hasFile('avatar')) {
             $imagePath = FileHelper::saveImage($request->file('avatar'), 'client', 'avatar');
         }
-        $skill=$request->skill;
+        $skill=$request->skill?explode(',', $request->skill):null;
         $majors=$request->majors;
         $validator=[];
         if($imagePath!=null)

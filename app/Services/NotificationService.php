@@ -15,7 +15,6 @@ class NotificationService implements INotificationService
         global $user_info;
         $data = Notifications::where('user_id', $user_info->id)
         ->where('type_user', $user_info->user_type)
-        ->where('time_push', '<=', now())
         ->orderBy('created_at','desc')
         ->get();
         return $data;
@@ -30,7 +29,7 @@ class NotificationService implements INotificationService
                     $message->to($user_info->email, $user_info->first_name)->subject($attributes['title']);
                 });
             }
-            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"noti_type"=>0,"type_user"=>$user_info->user_type,"is_read"=>0,"time_push"=>now()],$attributes) );
+            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"type_user"=>$user_info->user_type,"is_read"=>0],$attributes) );
             //$listNoti=Notifications::where('user_id','=',$user_info->id)->where('type_user','=',$user_info->user_type)->get()->toArray();
             event(new NewNotiEvent($newNoti,$user_info->id,$user_info->user_type));
             return $newNoti;
@@ -65,7 +64,7 @@ class NotificationService implements INotificationService
                     $message->to($user_info->email, $user_info->first_name)->subject($attributes['title']);
                 });
             }
-            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"noti_type"=>0,"type_user"=>$user_info->user_type,"is_read"=>0,"time_push"=>now()],$attributes) );
+            $newNoti=Notifications::create(array_merge(["user_id"=>$user_info->id,"type_user"=>$user_info->user_type,"is_read"=>0],$attributes) );
             //$listNoti=Notifications::where('user_id','=',$user_info->id)->where('type_user','=',$user_info->user_type)->get()->toArray();
             event(new NewNotiEvent($newNoti,$user_info->id,$user_info->user_type));
             return $newNoti;

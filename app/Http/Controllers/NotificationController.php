@@ -35,7 +35,6 @@ class NotificationController extends Controller
         $rules = [
             'title' => ['required', 'string'],
             'message' => ['required', 'string'],
-            'time_push'=> ['string'],
             'image' => ['string', 'nullable', 'regex:/^(http(s)?:\/\/.*\.(png|jpg|jpeg|gif|bmp))$/i'],
             'linkable' => ['required','string'],
             'user_type'=>['required','string'],

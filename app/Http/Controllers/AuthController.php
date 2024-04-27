@@ -440,7 +440,7 @@ class AuthController extends Controller
             $resultCallApi=json_decode($response->getBody()->getContents());
         
             $dataInsert=[
-                "address"=>$resultCallApi->data[0]->address,
+                //"address"=>$resultCallApi->data[0]->address,
                 "date_of_birth"=>\Carbon\Carbon::createFromFormat('d/m/Y',$resultCallApi->data[0]->dob )->toDateString(),
                 "citizen_identification_id"=>$resultCallApi->data[0]->id,
                 "citizen_identification_url"=>$imagePath,

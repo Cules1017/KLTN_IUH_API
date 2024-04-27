@@ -11,6 +11,7 @@ use App\Models\Job;
 use App\Models\Tasks;
 use App\Models\Invite;
 use App\Models\Comment;
+use App\Models\Skill;
 use App\Services\IAdminService;
 use App\Services\IJobService;
 use App\Services\INotificationService;
@@ -93,8 +94,6 @@ class JobController extends Controller
 
     public function createNewPost(Request $request)
     {
-        $page = $request->page;
-        $num = $request->num;
         $data = null;
         global $user_info;
         $client_id = $user_info->id;
@@ -107,7 +106,7 @@ class JobController extends Controller
             'bids' => 'required|numeric|min:0', // Đảm bảo bids là số dương hoặc bằng 0
             'deadline' => 'required|date', // Đảm bảo deadline là kiểu ngày
             'status'=>'required|numeric',
-            'skill'=>'array'
+            'skill'=>'string', //
         ];
         $messages = [
             'required' => 'Trường :attribute là bắt buộc.',
@@ -125,9 +124,7 @@ class JobController extends Controller
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
-        // tính min_proposal
-        $min_proposal = 10;
-        $skill = $request->skill;
+        $skill = $request->skill?explode(',', $request->skill):null;
         $validator = $validator->validated();
         $imagePath = $request->thumbnail ? $request->thumbnail : '';
         $contentFile=null;
@@ -137,7 +134,7 @@ class JobController extends Controller
         if ($request->hasFile('content_file')) {
             $contentFile = FileHelper::saveImage($request->file('content_file'), 'client/file_job', 'file_job');
         }
-        $data = $this->jobService->create(array_merge($validator, ['client_id' => $client_id,'content_file'=>$contentFile, 'thumbnail' => $imagePath, 'min_proposals' => $min_proposal]));
+        $data = $this->jobService->create(array_merge($validator, ['client_id' => $client_id,'content_file'=>$contentFile, 'thumbnail' => $imagePath,'skill'=>$skill]));
         return $this->sendOkResponse($data);
     }
     public function getMyPost(Request $request)
@@ -169,13 +166,13 @@ class JobController extends Controller
         if($data==[]) return $this->sendFailedResponse("Không tìm thấy thông tin chi tiết", -1, "Không tìm thấy thông tin chi tiết", 400);
         $data['status_text'] = $status_arr[$data->status];
         $data['tasks'] = Tasks::where('job_id', "=", $id)->get();
-        $data['applied'] = CandidateApplyJob::where('job_id', $id)->orderBy('candidate_apply_job.proposal', 'desc')
+        $data['applied'] = CandidateApplyJob::where('job_id', $id)->orderBy('candidate_apply_job.created_at', 'desc')
             ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
             ->where('candidate_apply_job.status','!=','2')
             ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
             ->get();
         $data['applied_count'] = count($data['applied']);
-        $data['nominee'] = CandidateApplyJob::where('job_id', $id)->where('candidate_apply_job.status', ">", 2)->orderBy('candidate_apply_job.proposal', 'desc')
+        $data['nominee'] = CandidateApplyJob::where('job_id', $id)->where('candidate_apply_job.status', ">", 2)->orderBy('candidate_apply_job.created_at', 'desc')
             ->join('freelancer', 'freelancer.id', '=', 'candidate_apply_job.freelancer_id')
             ->select('candidate_apply_job.*', 'freelancer.username', 'freelancer.email',)
             ->first();
@@ -232,15 +229,13 @@ class JobController extends Controller
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
-        // tính min_proposal
-        $min_proposal = 0;
-        $skill = $request->skill;
+        $skill = $request->skill?explode(',', $request->skill):null;
         $validator = $validator->validated();
         $imagePath = $request->thumbnail ? $request->thumbnail : $jobInfo->thumbnail;
         if ($request->hasFile('thumbnail')) {
             $imagePath = FileHelper::saveImage($request->file('thumbnail'), 'client', 'avatar');
         }
-        $data = $this->jobService->updateWithData($id, array_merge($validator, ['thumbnail' => $imagePath, 'skill' => $skill, 'min_proposals' => $min_proposal]));
+        $data = $this->jobService->updateWithData($id, array_merge($validator, ['thumbnail' => $imagePath, 'skill' => $skill]));
         return $this->sendOkResponse($data);
     }
 
@@ -253,7 +248,7 @@ class JobController extends Controller
         //proposal trường này search theo min proposal truyền lên proposal=0,1.5
         //deadline trường này truyền lên khoảng thời gian deadline=yyyy-MM-dd,yyyy-MM-dd
         if (isset($request->skills) || isset($request->keyword) || isset($request->bids) || isset($request->status) || isset($request->proposal) || isset($request->deadline)) {
-            $data = $this->jobService->getListJobFillterForFreelancer($request->page, $request->num, $request->skills, $request->keyword, $request->bids, $request->status, $request->proposal, $request->deadline);
+            $data = $this->jobService->getListJobFillterForFreelancer($request->page, $request->num, $request->skills, $request->keyword, $request->bids, $request->status, $request->deadline);
         } else {
             $data = $this->jobService->getListJobForFreelancer($request->page, $request->num);
         }
@@ -269,7 +264,6 @@ class JobController extends Controller
         // Validation rules
         $rules = [
             'job_id' => ['required', 'integer', 'exists:jobs,id'],
-            'proposal' => ['required', 'numeric'],
             //'contract_id'=>['required', 'numeric'],
             'cover_letter'=>['string'],
             //'contract_id'=>['required', 'numeric'],
@@ -312,7 +306,6 @@ class JobController extends Controller
         $candidateApplyJob = CandidateApplyJob::create([
             'freelancer_id' => $freelancer->id,
             'job_id' => $validator['job_id'],
-            'proposal' => $validator['proposal'],
             'attachment_url' => $cvUrl,
             'cover_letter'=>$validator['cover_letter'],
             //'contract_id'=>$validator['contract_id'],
