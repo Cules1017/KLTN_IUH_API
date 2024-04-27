@@ -37,10 +37,11 @@ class HandleLoggingMiddleware
     public function handle(Request $request, Closure $next)
     {
         try {
+            //dd( request()->ip());
             $timeStart = microtime(true);
             $aData = json_encode([]);
             $req = $request->getMethod()
-                . ' ' . $request->url()
+                . ' ' . $request->url().' [IP:'.request()->ip().']'
                 . ' ' . http_build_query($request->all())
                 . ' ' . http_build_query($request->header())
                 . ' ' . $aData

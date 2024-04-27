@@ -15,13 +15,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\CandidateApplyJob;
+use App\Models\Job;
+use Illuminate\Support\Facades\DB;
+use App\Services\IFreelancerService;
 
 class ClientController extends Controller
 {
     public $clientService;
-    public function __construct(IClientService $clientService)
+    public $freelancerService;
+    public function __construct(IClientService $clientService,IFreelancerService $freelancerService)
     {
         $this->clientService = $clientService;
+        $this->freelancerService = $freelancerService;
     }
     public function index(Request $request)
     {
@@ -81,6 +87,7 @@ class ClientController extends Controller
             'company_name' => 'nullable|string',
             'introduce' => 'nullable|string',
             'bank_account' => 'nullable|exists:bank_accounts,id',
+            'is_completed_profile'=>'nullable'
         ];
 
         // Custom error messages
@@ -99,8 +106,10 @@ class ClientController extends Controller
         if ($request->hasFile('avatar')) {
             $imagePath = FileHelper::saveImage($request->file('avatar'), 'client', 'avatar');
         }
-
-        $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath]), $rules, $messages);
+        if($imagePath!='')
+            $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath]), $rules, $messages);
+        else
+           $validator = Validator::make(array_merge($rq), $rules, $messages); 
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
@@ -134,17 +143,17 @@ class ClientController extends Controller
         $page = $request->page ? $request->page : 1;
         if($request->recommend==1){
             // lấy thông tin job của user hiện tại và lấy các kỹ năng liên quan và đưa ra danh sách cá freelancer có kỹ năng liên quan
-            $data = $this->clientService->autoGetFreelancer($page,$num);
+            $data = $this->freelancerService->autoGetFreelancer($page,$num);
         }
-        if ( !$request->keyword == null || !$request->skills == null || !$request->date_of_birth == null||!$request->expected_salary == null||!$request->sex == null) {
+        if ( !$request->keyword == null || !$request->skills == null || !$request->majors == null || !$request->date_of_birth == null||!$request->expected_salary == null||!$request->sex == null) {
             // thực hiện lấy list theo search
             //keyword là search dựa trên các trường intro, address
             //sskill là list skills ex:skills=1,2,3,45,21. search theo id các freelancer có cái skill này bảng skill_freelancer_map
             //expected_salary search dưa trên mức lương mong đợi input là khoảng giá trị cách nhau dấu , expected_salary=1,100
             // sex giá trị 1 là nam 2 là nữ
-            $data = $this->clientService->searchListFreelancer($page,$num,$request->keyword, $request->skills, $request->date_of_birth, $request->expected_salary, $request->sex);
+            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->expected_salary, $request->sex);
         } else {
-            $data = $this->clientService->searchListFreelancer($page,$num,$request->keyword, $request->skills, $request->date_of_birth, $request->expected_salary, $request->sex);
+            $data = $this->freelancerService->searchListFreelancer($page,$num,$request->keyword, $request->skills,$request->majors, $request->date_of_birth, $request->expected_salary, $request->sex);
         }
         return $this->sendOkResponse($data);
     }
@@ -158,6 +167,7 @@ class ClientController extends Controller
             'job_id' => 'required|exists:jobs,id',
             'freelancer_id' => 'required|exists:freelancer,id',
             'mail_invite'=>'required|string',
+            'title'=>'required|string',
         ];
 
         // Custom error messages
@@ -187,10 +197,126 @@ class ClientController extends Controller
         Mail::send('mailinvite', ['company_name' => $user_info->company_name,'message_mail'=>$validator['mail_invite']], function ($message) use ($infoFreelancer,$user_info) {
             $message->to($infoFreelancer->email, $infoFreelancer->first_name)->subject("Thư mời làm việc từ ".$user_info->company_name);
         });
-        unset($insertData['mail_invite']);
+        // Tạo đối tượng candidate_apply_job
+        $candidateApplyJob = CandidateApplyJob::create([
+            'freelancer_id' => $validator['freelancer_id'],
+            'job_id' => $validator['job_id'],
+            'proposal' => 0,
+            'attachment_url' => '',
+            'cover_letter'=>'',
+            'status'=>2
+            //'contract_id'=>$validator['contract_id'],
+        ]);
+       // unset($insertData['mail_invite']);
         $data=Invite::create($insertData);
         return $this->sendOkResponse($data);
 
 
+    }
+
+    public function getListInvite(Request $request){
+         global $user_info;
+        // $InviteInfo=Invite::where('freelancer_id',$user_info->id)
+        // ->get()->toArray();
+        $num = $request->num ? $request->num : 10;
+        $page = $request->page ? $request->page : 1;
+
+        // foreach($InviteInfo as &$invite){
+        //     //dd($invite);
+        //     $invite['job_info']=Job::find($invite['job_id']);
+        //     $invite['client_info']=Client::find($invite['client_id']);
+        // }
+        // return $this->sendOkResponse($InviteInfo);
+        // Lấy thông tin lời mời dựa trên ID của freelancer
+    $InviteInfo = Invite::where('freelancer_id', $user_info->id)->paginate($request->num ? $request->num : 10);
+
+    // Thêm thông tin công việc và thông tin khách hàng vào mỗi lời mời
+    $InviteInfo->getCollection()->transform(function ($invite) {
+    $invite['job_info'] = Job::find($invite['job_id']);
+    $invite['client_info'] = Client::find($invite['client_id']);
+    return $invite;
+});
+
+return $this->sendOkResponse($InviteInfo);
+
+    }
+
+    public function acceptJob($id,Request $request){
+        global $user_info;
+        $freelancer = Freelancer::find($user_info->id);
+        $rq = MyHelper::convertKeysToSnakeCase($request->all());
+        // Validation rules
+        $rules = [
+            'status' => ['required', 'integer'],
+        ];
+
+        // Custom error messages
+        $messages = [
+            'required' => 'Trường :attribute là bắt buộc.',
+            'exists' => 'Trường :attribute không tồn tại trong bảng :table.',
+            'string' => 'Trường :attribute phải là chuỗi.',
+            'max' => 'Trường :attribute không được vượt quá :max ký tự.',
+            'numeric' => 'Trường :attribute phải là số.',
+            'integer' => 'Trường :attribute phải là số nguyên.',
+            'min' => 'Trường :attribute phải lớn hơn hoặc bằng :min.',
+            'date' => 'Trường :attribute phải là ngày hợp lệ.',
+        ];
+        $validator = Validator::make($rq, $rules, $messages);
+
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        }
+
+        $validator = $validator->validated();
+        $InviteInfo=Invite::find($id);
+        if($InviteInfo==null) return $this->sendFailedResponse("Không tìm thấy lời mời.", -1, "Không tìm thấy lời mời.", 422);
+        $jobInfo = Job::find($InviteInfo->job_id);
+        if ($jobInfo->status != 1)
+        {
+            $InviteInfo->status=-1;
+            $InviteInfo->save();
+            return $this->sendFailedResponse("Công việc đã được client đóng.", -1, "Công việc đã được client đóng.", 422);
+        }
+            
+        $countDB=DB::select('SELECT count(*) as c FROM candidate_apply_job WHERE job_id='.$InviteInfo->job_id.' AND status>2');
+        if ($countDB[0]->c>0)
+        {
+            $InviteInfo->status=-1;
+            $InviteInfo->save();
+            return $this->sendFailedResponse("Công việc đã có người thực hiện.", -1, "Công việc đã có người thực hiện.", 422);
+        }
+            
+        if($request->status==-1){
+            $InviteInfo->status=-1;
+            $InviteInfo->save();
+            return $this->sendOkResponse('Bạn đã từ chối lời mời công việc');
+        }
+        
+        $InviteInfo->status=1;
+        $InviteInfo->save();
+
+        // Trả về kết quả
+        return $this->sendOkResponse("Chấp nhận job thành công");
+    }
+
+
+    public function getMajors(Request $request){
+        $page=$request->page?$request->page:1;
+        $num =$request->num?$request->num:10;
+        $query = DB::table('majors');
+        $title_major=$request->title_major?$request->title_major:$request->titleMajor;
+        // Tìm kiếm theo từ khóa
+        if (!empty($title_major)) {
+            $query->where('title_major', 'LIKE', "%".$title_major."%");
+        }
+        $data=$query->select('majors.*')->distinct()
+                ->paginate($num, ['*'], 'page', $page);
+        return [
+                'data' => $data->items(),
+                'total' => $data->total(),
+                'total_page' => $data->lastPage(),
+                'num' => $num,
+                'current_page' => $page,
+            ];
     }
 }

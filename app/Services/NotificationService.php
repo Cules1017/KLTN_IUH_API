@@ -16,7 +16,7 @@ class NotificationService implements INotificationService
         $data = Notifications::where('user_id', $user_info->id)
         ->where('type_user', $user_info->user_type)
         ->where('time_push', '<=', now())
-        ->orderBy('time_push')
+        ->orderBy('created_at','desc')
         ->get();
         return $data;
 

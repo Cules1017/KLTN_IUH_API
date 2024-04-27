@@ -1,0 +1,983 @@
+# Webalizer V2.23-08 Incremental Data - 04/25/2024 23:18:29
+2024 4 25 23 18 29
+16051 8544 116 206 21 29 194573199 14998 282 0
+3 7 539 1 25
+644 326 2377070 5 627 15
+211 130 10345573 5 203 7
+319 215 7230917 7 300 7
+6 1 812118 5 6 5
+231 117 4650742 4 216 7
+992 496 7543052 4 921 11
+2089 1182 7773800 7 2041 35
+671 447 2848297 5 653 10
+229 119 5651068 5 216 5
+568 406 5168260 8 539 12
+139 64 4467189 4 135 4
+473 228 5269133 15 448 12
+489 205 1690814 6 478 8
+780 369 2814742 16 744 18
+527 233 5274798 26 493 23
+920 472 12367853 6 857 18
+24 11 593998 4 23 3
+1192 624 24775619 8 1075 17
+2296 1209 18344202 8 2123 17
+223 118 2586721 5 199 6
+1412 765 40090874 9 1234 18
+1413 700 18792948 7 1286 19
+105 55 1237177 1 98 2
+83 46 1285250 3 69 4
+15 6 580984 3 14 3
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+224 122 1838201 196
+63 14 571646 18
+1 0 285362 1
+1 0 49108 1
+1 0 112649 1
+1 0 285365 1
+10 3 2340777 7
+37 15 3946153 35
+342 207 12857081 311
+428 292 4438627 400
+514 334 4860508 499
+722 447 4532499 678
+424 231 5965936 402
+906 453 5388148 868
+923 510 16897629 804
+958 518 11831095 869
+1516 810 26996576 1410
+675 363 6071037 650
+568 277 4352782 555
+1218 649 11482206 1121
+1916 1000 21333100 1793
+1692 888 14895155 1586
+1627 807 18308443 1527
+1284 604 14933116 1265
+95
+0
+0
+8544
+0
+0
+0
+6591
+0
+0
+0
+57
+2
+0
+45
+0
+0
+83
+120
+0
+145
+52
+26
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+291
+0
+0
+0
+0
+0
+# -urls- 
+/api/v1/job/task/14
+0 9 0 6217 0 1
+/api/v1/notifications/114/seen
+0 2 0 1423 0 0
+/api/v1/job/93
+0 2 0 1694 0 0
+/api/v1/job/110/task
+0 66 0 74910 3 2
+/api/v1/client/job/21/recruit-confirm
+0 1 0 538 0 0
+/api/v1/job/62
+0 113 0 194395 1 4
+/api/v1/job/108
+0 95 0 99699 0 2
+/storage/client/p1gaHfaCrPnbL6MKj4Gm5LpWZg5UFpUuav8x1xAU.png
+0 22 0 406912 0 0
+/api/v1/job/task/16/confirm-status
+0 2 0 2209 0 0
+/api/v1/client/job/104
+0 1 0 538 0 0
+/api/v1/login
+0 501 0 925582 58 8
+/api/v1/job/task/8/set-status
+0 4 0 3443 0 1
+/api/v1/client/job/96
+0 1 0 538 0 0
+/storage/CitizenIdentificationCard/HZKZIuXNWQljQ0jsNpZLL1ZhUJtsBrvYO3cIl7dy.jpg
+0 1 0 340745 0 0
+/api/v1/job/61
+0 112 0 196399 5 4
+/api/v1/job/66
+0 102 0 141265 2 2
+/api/v1/job/73
+0 1 0 803 0 0
+/api/v1/job/61/task
+0 27 0 17378 2 0
+/api/v1/job/68
+0 6 0 12128 0 0
+/storage/client/kqyG6oHircIGg5ABxD8oJwacq6LNINNDNdXt6Nkh.webp
+0 14 0 309951 0 0
+/api/v1/job/64/task
+0 11 0 6773 0 0
+/api/v1/job/task/15/add-cmt-task
+0 11 0 7128 0 0
+/storage/client/file_job/DcVTeAheb6JNBivBPEad8Nwwe44jFqW9a66aXdYB.jpg
+0 1 0 97944 0 0
+/storage/client/WJwu2eeWlKM8YyLMCBOdGLjUve4hEL3dgWEwjSUy.webp
+0 48 0 9713579 0 0
+/api/v1/job/task/15
+0 5 0 3517 0 1
+/storage/client/0mkbD4xUSM3Jt1v9uqTUadpomtdekUpffWAd78Ox.jpg
+0 1 0 126556 0 0
+/api/v1/client/invite/list
+0 39 0 61335 2 0
+/api/v1/job/67/new-task
+0 2 0 1320 0 0
+/api/v1/job/task/8
+0 2 0 1565 0 0
+/storage/CitizenIdentificationCard/kDxvZPvFVb8FE5Z7PFrlmQGAqgmLH9WWln7D9qZs.jpg
+0 1 0 340745 0 0
+/api/v1/job/task/14/set-status
+0 1 0 696 0 0
+/api/v1/job/69/task
+0 14 0 10291 0 0
+/api/v1/job/task/10/delete-cmt-task
+0 1 0 3833 0 0
+/storage/client/L2fxyqD9e50TnHixcuVE1Lj3uSxWfFhgIlkTzZrg.xlsx
+0 6 0 66638 0 0
+/api/v1/client/job/create-job
+0 11 0 10862 1 1
+/api/v1/job/95
+0 1 0 851 0 0
+/storage/client/file_job/3rsyBidyoumBK4kuVn6S48dvbgql8VdPW9191PcV.pdf
+0 7 0 10301357 0 0
+/api/v1/job/67/task
+0 52 0 49482 0 0
+/storage/CitizenIdentificationCard/ZFS3hzGze8ttMWEKtLYd6PI4ueKAvj4wXMJAQrnq.jpg
+0 2 0 681488 0 0
+/api/v1/job/task/9/set-status
+0 4 0 2677 0 1
+/api/v1/client/job/98
+0 1 0 537 0 0
+/api/v1/client/invite/accept/4
+0 2 0 1758 0 0
+/storage/CitizenIdentificationCard/xrcoPqjT5Awb8QJt2UkWHtW2raWTAl67pHlhkJv6.jpg
+0 1 0 340746 0 0
+/storage/CitizenIdentificationCard/A6mqra8YS1JWAzz9nwJeRTL1WDArZhu35wG7rI9N.jpg
+0 1 0 340745 0 0
+/api/v1/job/99
+0 2 0 1806 0 0
+/api/v1/job/task/11/set-status
+0 2 0 1324 0 0
+/api/v1/job/66/task
+0 126 0 99996 2 2
+/api/v1/job/75
+0 1 0 803 0 0
+/api/v1/client/job/update-jobs/61
+0 3 0 4004 0 0
+/storage/client/xcwmWjr7zTk2uuQ1lefllHOWloDOre2rEGXtrpg7.webp
+0 21 0 469305 0 0
+/api/v1/notifications/107/seen
+0 3 0 2461 0 0
+/storage/client/file_job/gjcZSBoc4KgATEr9UB4aheZ70PGaukH6vteJ5nR8.pdf
+0 18 0 10284255 0 0
+/api/v1/job/109
+0 19 0 19794 0 0
+/storage/CitizenIdentificationCard/VwoAMkQ4BIjqJO1hHuop1PCg9tpFw3EzcytvzoYl.jpg
+0 1 0 340744 0 0
+/api/v1/client/job/101
+0 1 0 538 0 0
+/api/v1/job/task/1/add-cmt-task
+0 17 0 21596 0 0
+/api/v1/job/task/1/delete-cmt-task
+0 4 0 6802 0 1
+/api/v1/job/110/new-task
+0 3 0 1980 0 0
+/api/v1/client/job/update-jobs/108
+0 7 0 10013 0 0
+/storage/client/q4jU8dxVGHLweBbKTD5v4oqY7INvp3pHRhGXmJPo.png
+0 46 0 2182766 0 0
+/api/v1/job/task/6
+0 1 0 535 0 0
+/storage/notificationdefault.png
+0 69 0 1552511 0 0
+/storage/client/file_job/07tJ2n7QbAT4tfAbBY8vWPtiitnU2rYkVVM3ELSb.xlsx
+0 3 0 36732 0 0
+/api/v1/job/85
+0 69 0 63852 2 2
+/api/v1/client/job/23/recruit-confirm
+0 1 0 538 0 0
+/api/v1/verify-citizen-identification-card
+0 4 0 14469 1 1
+/storage/mauhd.docx
+0 8 0 179049 0 0
+/api/v1/client/freelancers
+0 163 0 428458 7 3
+/storage/client/46AxgLoEu0xdqRay4h4RfFQk26wji6kN7vhCIW1g.png
+0 1 0 16175 0 0
+/storage/client/4euuxG5wjPMzRkjgzu2efiW0whGtPT6GUAuguvkP.png
+0 1 0 16175 0 0
+/storage/comment/O2oleksIXYw5baadom2NSoMkTzelDGoqRoIGK5pC.pdf
+0 1 0 841989 0 0
+/api/v1/job/67
+0 208 0 392561 2 1
+/api/v1/job/63
+0 72 0 110774 2 4
+/storage/CitizenIdentificationCard/DEK9S672hWWU550Ykhbtcq2aqBVfVDF6eGQvxku0.jpg
+0 1 0 340744 0 0
+/api/v1/job/task/6/set-status
+0 1 0 657 0 0
+/storage/CitizenIdentificationCard/fdXANSa14uIJ7YKKtMfZgT9wg91tMxzpBr2tDPiL.jpg
+0 1 0 340745 0 0
+/api/v1/job/task/4/delete-cmt-task
+0 2 0 1753 0 1
+/api/v1/job/69/new-task
+0 1 0 653 0 0
+/api/v1/notifications/111/seen
+0 2 0 1697 0 0
+/api/v1/job/62/new-task
+0 2 0 1301 0 0
+/api/v1/job/111
+0 14 0 15676 0 0
+/favicon.ico
+0 6 0 1137 0 0
+/api/v1/freelancer/job/applied
+0 503 0 1193798 13 11
+/api/v1/notifications/127/seen
+0 2 0 1560 0 0
+/api/v1/client/job/16/recruit-confirm
+0 4 0 2149 0 0
+/storage/client/file_job/xc9uMQ2XtwZDXyHthr8wCRTTSUx8vkuDzPaJ6BjX.pdf
+0 11 0 6283847 0 0
+/storage/client/file_job/D0HPTOIrt4UamhVuwM9kgyYbw914HOO4UEvR18sS.jpg
+0 3 0 41696 0 0
+/storage/client/6bIMVIaEFXSUFNkiR4fsXm6tbgJ2LJfzDs7tZjV3.jpg
+0 14 0 135555 0 0
+/api/v1/client/invite/accept/9
+0 1 0 571 0 0
+/storage/CitizenIdentificationCard/97jupDm6ISnRIo37lV7YfOmgohJ536Y7jUvEid74.jpg
+0 2 0 681490 0 0
+/api/v1/job/77
+0 1 0 805 0 0
+/api/v1/mylist/5
+0 2 0 4701 0 0
+/api/v1/register
+0 7 0 5298 0 1
+/api/v1/job/89
+0 44 0 43035 0 0
+/storage/comment/SDKAdgfWW5JpBuDqxCWRsxiFXkG7knYaeJj68Eio.jpg
+0 11 0 1805133 0 0
+/storage/client/file_job/oYLw1iw3dp8g59OLFUaTbCk5fCDugmiAVph2cTXU.png
+0 5 0 129763 0 0
+/api/v1/notifications/112/seen
+0 1 0 854 0 0
+/api/v1/notifications/121/seen
+0 1 0 744 0 0
+/api/v1/client/job/105
+0 1 0 538 0 0
+/api/v1/job/task/5/set-status
+0 4 0 2668 0 0
+/api/v1/job/63/new-task
+0 3 0 1961 0 0
+/api/v1/job/101
+0 1 0 864 0 0
+/storage/comment/xkT1cYutFN6YnB2Vnn0kHZRbfi2JDKNnwt1AnSzE.jpg
+0 3 0 227380 0 0
+/api/v1/client/job/100
+0 1 0 536 0 0
+/api/v1/client/invite/accept/11
+0 3 0 1714 0 0
+/api/v1/job/task/8/add-cmt-task
+0 8 0 5152 0 0
+/api/v1/job/task/4/set-status
+0 3 0 1972 0 0
+/api/v1/job/task/10/set-status
+0 2 0 1376 0 0
+/api/v1/job/task/18/add-cmt-task
+0 1 0 628 0 0
+/api/v1/job/63/task
+0 22 0 30666 0 0
+/api/v1/job/96
+0 2 0 1732 0 0
+/api/v1/job/65
+0 1 0 1048 0 0
+/storage/client/file_job/X4csjkeqqGQKacPXs3aQtltAzXtvu8asJUO2pF3h.jpg
+0 1 0 3481982 0 0
+/storage/client/KZ6Af4XSXliTrfingb5hIo5XAYMHVMTnTaA33gGO.jpg
+0 2 0 68819 0 0
+/storage/client/AcuaOcei42PyoTeaYP1Vsey1wHypwcnKBAkkNCMK.jpg
+0 1 0 408142 0 0
+/storage/client/file_job/k9xahfDfxkYJXmyy1lsTBiJ4Wr3znMdXHRfRv3kX.pdf
+0 2 0 1141719 0 0
+/api/v1/notifications
+0 1145 0 1379807 26 54
+/api/v1/job/110
+0 148 0 236560 6 8
+/api/v1/freelancer/info
+0 688 0 721793 18 3
+/api/v1/client/job/19/recruit-confirm
+0 1 0 537 0 0
+/storage/client/5pOGjHvvlf28iid3Ba9HVA6gseo8BgvpCcgnrUvG.png
+0 3 0 16469 0 0
+/api/v1/job/task/16/set-status
+0 3 0 3123 0 0
+/api/v1/job/97
+0 1 0 859 0 0
+/api/v1/job/72
+0 4 0 3199 0 0
+/api/v1/job/task/18/set-status
+0 2 0 1412 0 0
+/storage/cv_freelancer/PhOEfVkcxydwuQ7gNiga5dsrkCnDd31EyXqHgHxE.docx
+0 2 0 409320 0 0
+/api/v1/job/69
+0 32 0 40690 1 0
+/api/v1/mylist
+0 3 0 2674 0 0
+/storage/client/G0vtuJZWIW0NYall25sYZVhi0055qXmo0UIsH8Fx.png
+0 2 0 35618 0 0
+/api/v1/notifications/118/seen
+0 1 0 733 0 0
+/storage/CitizenIdentificationCard/SDLkf6X9hI5wrToHBQx7uTCrsIX0Io2WbUOJmiST.jpg
+0 1 0 75744 0 0
+/api/v1/job/task/18/confirm-status
+0 1 0 734 0 0
+/api/v1/job/task/17/confirm-status
+0 3 0 2317 0 0
+/api/v1/job/task/15/set-status
+0 5 0 3520 0 0
+/api/v1/job/61/new-task
+0 1 0 626 0 0
+/storage/mauhd.doc
+0 3 0 39945 0 0
+/storage/comment/5GTnBWhH2HCzK0Orl8cTi11BANAI7B2fcyArmCak.txt
+0 2 0 5714 0 0
+/api/v1/notifications/133/seen
+0 1 0 789 0 0
+/api/v1/job/task/13
+0 1 0 704 0 0
+/api/v1/job/94
+0 1 0 853 0 0
+/api/v1/job/79
+0 1 0 799 0 0
+/storage/client/WE1d6l2JHomTrHrpJUcnokO6sqZBxcWBT8ugQrQ7.png
+0 98 0 2104274 0 0
+/api/v1/job/64
+0 37 0 49424 0 0
+/storage/client/file_job/spJpDTIo0nY6klxqWviPiL59SYvZ4s1EewR6gVr6.jpg
+0 29 0 6471799 0 0
+/storage/client/QdstOaPoNpPemIHEiGOnJv3ZNGPYQBgiFpL7t0JS.webp
+0 4 0 135150 0 0
+/api/v1/job/task/17/set-status
+0 2 0 1345 0 0
+/storage/client/L1mnbgL032rSglSmbStBFIHlcgV6X8rxmDFrGWlp.png
+0 2 0 16321 0 0
+/api/v1/client/freelancers/invite
+0 11 0 7376 0 1
+/api/v1/client/job/94
+0 1 0 538 0 0
+/storage/client/MFEFf3gCsqhXPh5EVp4esj2xMey5HjdGayAlRF2M.webp
+0 68 0 13740305 0 0
+/api/v1/client/job/my-jobs
+0 690 0 1368364 12 14
+/storage/CitizenIdentificationCard/qsHs5yzXNwAKj3WLIWz63FawPeGfrwFDXQP0rLLQ.jpg
+0 2 0 681491 0 0
+/api/v1/job/84
+0 2 0 1595 0 0
+/storage/CitizenIdentificationCard/IA9fETBNU3fhlgJM1pPP15DHaodw3Wnsv4lS2J6L.jpg
+0 1 0 340744 0 0
+/api/v1/freelancer/info/update
+0 12 0 21189 0 1
+/api/v1/job/105
+0 2 0 2234 0 0
+/api/v1/freelancer/job/apply
+0 14 0 18858 2 1
+/storage/CitizenIdentificationCard/xCjxxUkycBRVliw9dbDL5eljv0pPQWWwg4Cwd643.jpg
+0 2 0 677096 0 0
+/storage/client/xFIU3rOa6LmNGarMBYjftGI485ZViHzYYflSxzzY.webp
+0 4 0 86669 0 0
+/storage/client/xf1qbU4v6X5cm04rEvts266vhgwS4q3sl7GRTYZ0.webp
+0 11 0 2216968 0 0
+/storage/client/6lttxHVunxrxwrmTAhIIVQF3IfO6Zc5T4dFanFbc.png
+0 66 0 1077627 0 0
+/api/v1/client/job/8/recruit-confirm
+0 1 0 837 0 0
+/api/v1/client/info
+0 542 0 443354 34 5
+/api/v1/client/job/106
+0 1 0 538 0 0
+/api/v1/majors
+0 4 0 3953 0 0
+/storage/CitizenIdentificationCard/kK5kC0o6Yta5hcRlCWQaoZAQN76DyV5rhT5lwT3f.jpg
+0 2 0 681491 0 0
+/api/v1/job/70/new-task
+0 1 0 672 0 0
+/api/v1/client/info/update
+0 13 0 10621 0 0
+/api/v1/client/job/102
+0 1 0 536 0 0
+/api/v1/job/task/10/add-cmt-task
+0 15 0 9873 0 0
+/api/v1/freelancer/job
+0 501 0 1144809 15 17
+/api/v1/client/job/97
+0 1 0 538 0 0
+/storage/hopdongtp.docx
+0 38 0 680419 0 0
+/storage/comment/c7EAdSgRt9ouuA7X3vT5LsXH4tuUVxLzMC5z2KvI.docx
+0 5 0 32239 0 0
+/api/v1/client/job/107
+0 1 0 538 0 0
+/storage/client/RF9IWPncCUf0Wnf1zX4xmCB73cBP6mzo4bW2Nfrd.webp
+0 101 0 20438616 0 0
+/api/v1/client/invite/accept/5
+0 1 0 571 0 0
+/storage/CitizenIdentificationCard/OLqCrn9mr76akaMf840ZGEfw6t1NPHiLHuiuarXJ.jpg
+0 2 0 681490 0 0
+/storage/comment/xkkmHDI94SBptIKyg2VRLY3aYY9QrHqgt27jGk9F.png
+0 12 0 303848 0 0
+/api/v1/client/job/95
+0 1 0 539 0 0
+/storage/comment/xTVeuoZ3wbNnZW9v5DsLsreYdYj4eXzqsJkt1s0Q.jpg
+0 1 0 75794 0 0
+/api/v1/job/task/1
+0 8 0 8715 0 0
+/api/v1/job/62/task
+0 71 0 50682 0 0
+/api/v1/client/job/93
+0 1 0 538 0 0
+/robots.txt
+0 14 0 28719 0 0
+/api/v1/client/job/103
+0 1 0 538 0 0
+/api/v1/job/71
+0 4 0 3396 0 0
+/api/v1/job/70
+0 68 0 84191 0 1
+/api/v1/send-otp
+0 142 0 99186 2 7
+/api/v1/verify-otp
+0 18 0 13498 0 2
+/storage/client/bbkP3jaGeWNW9aBoBbN6Eknu8r2zq8rnbSP0wMNq.pdf
+0 2 0 1134795 0 0
+/storage/client/wggbxK1nv7q3SYkZYRCyQyUfvYg9CIWdvnfXgn6F.png
+0 15 0 101980 0 0
+/api/v1/administrator/skill
+0 381 0 507504 5 6
+/api/v1/job/task/16/add-cmt-task
+0 14 0 14075 2 1
+/api/v1/info-user
+0 415 0 1110073 2 16
+/storage/CitizenIdentificationCard/c914zusAInbEx4YvlKeCrEkM73BV19z0z7uZWlmD.jpg
+0 2 0 681489 0 0
+/storage/client/NS1D1XzIn0FXq3CuNRZEaFxTOIXQqEx36ODywn5b.jpg
+0 50 0 4992874 0 0
+/api/v1/client/job/99
+0 1 0 538 0 0
+/api/v1/job/ 66
+0 1 0 1686 0 0
+/api/v1/job/70/task
+0 28 0 25982 1 1
+/storage/client/0n7ahQmyAjcNjUWhG8k031z3BnRTEoVEaqXYKCI1.jpg
+0 21 0 913111 0 0
+/storage/comment/tXqszAwHVIHxSTLgrgGjbZAMov3y1fw09KtObtzH.jpg
+0 7 0 88505 0 0
+/api/v1/job/66/new-task
+0 2 0 1249 0 0
+/storage/client/ttyRVMuwEchFYhIPqY4wz3UyvfpapTtLXUPyd66e.png
+0 79 0 2046684 0 0
+/api/v1/job/102
+0 1 0 848 0 0
+/storage/client/file_job/9ldQ8noZbF2xg0UmT8vZAWt4rqXTpgA2rftECnxH.jpg
+0 1 0 4581834 0 0
+# End Of Table - urls
+# -sites- (monthly)
+47.128.152.164
+0 2 0 5871 0 0
+-
+116.106.230.147
+0 1136 1012 5597377 17 1712781357
+/api/v1/freelancer/job/applied
+115.79.42.100
+0 26 13 27277 1 1713178011
+/api/v1/client/freelancers
+3.255.165.4
+0 1 0 112649 1 1712210994
+-
+165.232.65.159
+0 1 0 112649 1 1713085655
+-
+66.249.71.68
+0 3 1 585246 2 1712729292
+-
+123.29.68.66
+0 1706 842 18204803 27 1713552915
+/api/v1/notifications
+66.249.72.160
+0 1 1 3434 0 0
+-
+23.178.112.202
+0 2 0 5871 0 0
+-
+171.246.111.144
+0 183 92 785826 5 1713303817
+/api/v1/freelancer/job
+52.167.144.237
+0 1 0 285364 1 1713173028
+-
+13.48.248.166
+0 2 0 5872 0 0
+-
+52.77.242.209
+0 2 0 5880 0 0
+-
+42.117.162.66
+0 489 255 2651031 4 1713479743
+/api/v1/client/freelancers
+52.167.144.136
+0 1 0 285361 1 1713685322
+-
+14.184.182.85
+0 82 41 7401198 5 1713480495
+/api/v1/freelancer/job/applied
+42.117.163.122
+0 319 162 830756 3 1712528619
+/api/v1/notifications
+52.112.49.197
+0 2 0 9266 1 1712186622
+/api/v1/freelancer/job/apply
+66.249.79.134
+0 1 0 290912 1 1712912046
+-
+27.70.243.47
+0 48 38 950947 1 1712072685
+-
+51.20.32.244
+0 2 0 5878 0 0
+-
+42.118.27.124
+0 155 90 2351709 1 1713718753
+/api/v1/job/task/8/add-cmt-task
+40.77.167.63
+0 1 0 285362 1 1712973602
+-
+42.118.26.162
+0 313 159 739201 2 1713563455
+/api/v1/notifications
+15.235.162.58
+0 1 0 181956 1 1713709870
+/api/v1/job/task/16/add-cmt-task
+183.91.188.229
+0 1 0 306800 1 1712062002
+-
+14.161.25.75
+0 1835 943 21054620 7 1713805384
+/api/v1/notifications
+123.23.100.117
+0 81 41 9690293 4 1713720284
+/api/v1/majors
+115.77.184.162
+0 7 3 9159 2 1713178188
+/api/v1/client/freelancers
+13.229.91.130
+0 4 0 11750 0 0
+-
+13.48.55.210
+0 2 0 5880 0 0
+-
+171.250.41.167
+0 2543 1354 42490584 30 1714086369
+/api/v1/notifications
+40.77.167.19
+0 1 0 285360 1 1713813770
+-
+207.46.13.128
+0 1 0 285362 1 1713524278
+-
+52.13.26.232
+0 2 0 5869 0 0
+-
+34.214.202.139
+0 2 0 5878 0 0
+-
+198.235.24.85
+0 1 0 425 1 1712741661
+-
+95.217.18.177
+0 2 0 225373 2 1713221094
+-
+52.41.188.109
+0 2 0 1054608 1 1712926488
+-
+18.201.243.63
+0 1 0 112649 1 1712203464
+-
+14.225.11.130
+0 366 154 880702 8 1713372146
+/api/v1/notifications
+222.253.82.56
+0 249 128 2066300 1 1713456131
+/api/v1/notifications
+13.49.72.48
+0 2 0 5872 0 0
+-
+18.221.84.206
+0 2 0 5880 0 0
+-
+23.178.112.206
+0 2 0 5880 0 0
+-
+159.203.38.66
+0 2 0 291206 1 1712916871
+-
+52.37.211.3
+0 2 0 5878 0 0
+-
+52.167.144.212
+0 1 0 285453 1 1713918735
+-
+157.55.39.223
+0 5 5 1026 0 0
+-
+115.73.28.125
+0 2768 1378 26036361 47 1713306488
+/api/v1/freelancer/job
+209.38.154.154
+0 2 0 290636 1 1713534958
+-
+52.38.60.23
+0 2 0 113092 1 1712884581
+-
+64.227.9.44
+0 2 0 113072 1 1713776554
+-
+66.249.66.164
+0 1 0 290702 1 1712469808
+-
+35.93.184.7
+0 2 0 5872 0 0
+-
+42.118.26.80
+0 100 49 103572 3 1713130206
+/api/v1/freelancer/job
+198.199.90.183
+0 2 0 291231 1 1713550834
+-
+18.246.251.165
+0 2 0 1054606 1 1712905021
+-
+15.235.162.47
+0 1 0 3596 1 1713710424
+/api/v1/freelancer/job/applied
+13.60.41.101
+0 2 0 5879 0 0
+-
+198.235.24.234
+0 1 0 49108 1 1712719709
+-
+52.167.144.230
+0 1 0 285463 1 1714087109
+-
+3.136.108.84
+0 1 0 584 0 0
+-
+115.73.213.185
+0 8 4 7732 1 1713176694
+/api/v1/client/job/my-jobs
+167.99.243.82
+0 2 0 113540 1 1712391860
+-
+115.79.24.231
+0 18 9 17938 1 1713178134
+/api/v1/client/freelancers
+52.167.144.21
+0 1 0 285357 1 1712707893
+-
+171.250.162.70
+0 8 4 632030 1 1713818714
+/api/v1/job/110/task
+115.78.94.126
+0 14 7 14683 2 1713179312
+/api/v1/client/job/my-jobs
+206.189.206.82
+0 2 0 291204 1 1713601080
+-
+27.70.243.90
+0 45 34 75692 1 1712056900
+/api/v1/administrator/skill
+66.249.66.166
+0 1 1 3433 0 0
+-
+40.77.167.35
+0 1 0 285450 1 1714072425
+-
+137.184.166.3
+0 2 0 291203 1 1712215683
+-
+111.90.158.66
+0 2 0 8817 1 1713621398
+-
+115.79.27.202
+0 16 8 17071 1 1713177014
+/api/v1/client/job/my-jobs
+115.78.229.100
+0 4 2 3866 1 1713177519
+/api/v1/client/job/my-jobs
+167.99.177.55
+0 2 0 290996 1 1713378664
+-
+66.249.72.174
+0 2 1 294139 1 1713401263
+-
+66.249.71.69
+0 4 2 585391 2 1713772977
+-
+113.161.92.177
+0 8 4 7816 1 1713169145
+/api/v1/client/job/my-jobs
+54.190.65.4
+0 2 0 5879 0 0
+-
+115.78.5.154
+0 18 9 17938 2 1713179360
+/api/v1/client/job/my-jobs
+203.119.9.50
+0 1 0 481 1 1711972833
+-
+137.184.123.145
+0 2 0 291206 1 1713254533
+-
+115.73.214.107
+0 16 8 17071 1 1713179333
+/api/v1/client/job/my-jobs
+23.178.112.201
+0 2 0 5880 0 0
+-
+112.213.89.118
+0 22 22 7231385 0 0
+-
+23.22.138.215
+0 1 0 13530 1 1712577389
+-
+40.77.167.30
+0 2 0 2690 1 1713685319
+-
+115.79.25.196
+0 8 4 9339 1 1713176748
+/api/v1/client/job/my-jobs
+23.178.112.106
+0 4 0 11749 0 0
+-
+18.119.9.111
+0 1 0 584 0 0
+-
+40.77.167.61
+0 1 0 284167 1 1712672650
+/api/v1/freelancer/job/apply
+52.167.144.219
+0 2 0 570921 2 1713379159
+-
+66.249.66.165
+0 1 1 3434 0 0
+-
+52.167.144.216
+0 1 0 284164 1 1712672065
+/api/v1/freelancer/job/apply
+15.235.162.57
+0 1 0 3596 1 1713699437
+/api/v1/freelancer/job
+44.234.56.236
+0 2 0 113092 1 1712856047
+-
+42.117.162.20
+0 324 164 1931959 8 1712422210
+/api/v1/notifications
+66.249.71.70
+0 3 1 297749 2 1713593718
+-
+67.205.169.69
+0 2 0 113073 1 1712563848
+-
+147.182.145.249
+0 2 0 113072 1 1712168972
+-
+13.250.62.48
+0 2 0 5880 0 0
+-
+209.38.138.62
+0 2 0 291206 1 1713429788
+-
+14.230.242.183
+0 515 256 1739480 4 1713570901
+/api/v1/info-user
+23.178.112.200
+0 2 0 5871 0 0
+-
+171.252.153.138
+0 2123 1064 23218980 28 1713252622
+/api/v1/client/invite/accept/4
+3.129.216.198
+0 4 0 11750 0 0
+-
+103.97.126.18
+0 8 0 41477 0 0
+-
+52.167.144.161
+0 1 0 285559 1 1713085810
+-
+18.143.161.118
+0 2 0 5870 0 0
+-
+34.220.0.130
+0 2 0 5870 0 0
+-
+116.106.203.167
+0 346 177 4840360 5 1713479437
+/api/v1/client/freelancers
+52.167.144.55
+0 1 1 220 0 0
+-
+134.122.87.44
+0 2 0 113082 1 1712342737
+-
+# End Of Table - sites (monthly)
+# -sites- (daily)
+171.250.41.167
+0 13 6 10071 1 1714086369
+/api/v1/notifications
+52.167.144.230
+0 1 0 285463 1 1714087109
+-
+40.77.167.35
+0 1 0 285450 1 1714072425
+-
+# End Of Table - sites (daily)
+# -referrers- 
+http://upwork.local:3000/
+0 1927
+https://codebeautify.org/
+0 4
+https://timviecits.id.vn/storage/client/file_job/X4csjkeqqGQKacPXs3aQtltAzXtvu8asJUO2pF3h.jpg
+0 1
+https://timviecits.id.vn/storage/CitizenIdentificationCard/xCjxxUkycBRVliw9dbDL5eljv0pPQWWwg4Cwd643.jpg
+0 1
+https://timviecits.id.vn/storage/notificationdefault.png
+0 1
+https://timviecits.id.vn/storage/client/file_job/spJpDTIo0nY6klxqWviPiL59SYvZ4s1EewR6gVr6.jpg
+0 1
+- (Direct Request)
+0 2690
+http://www.timviecits.id.vn/.well-known/acme-challenge/B2z4YT7sGBQkGwamVvS4CAcn4DeD55iAZy3XQmsSm1c
+0 4
+http://www.timviecits.id.vn/.well-known/acme-challenge/b5BdzIPknL4fYNgKKQSc1sSq6OLPWhvw3SiDOMLKmoU
+0 5
+https://timviecits.id.vn/api/v1/freelancer/job/applied
+0 1
+http://timviecits.id.vn/.well-known/acme-challenge/_b6IsMB5z6EGZXH1v-qsU6n3OyDyADuk4crM2028MAs
+0 4
+http://timviecits.id.vn
+0 1
+https://desktop.postman.com/
+0 1
+http://timviecits.id.vn/.well-known/acme-challenge/htkaPXnxDgZSBjmQyzhCWXWxjV19qw_KYhaK-iZughc
+0 5
+http://timviecits.id.vn/api/v1/client/job/create-job
+0 3
+http://timviecits.id.vn/.well-known/acme-challenge/siUnslyVPKMuYAe9qVf8_La4295AAKpYk1GOxRVUOjw
+0 3
+http://timviecits.id.vn/api/v1/login
+0 1
+http://www.timviecits.id.vn/.well-known/acme-challenge/v9I936pdGtGpDDObW_FazM13uKKvNNRoWHC85dup9E4
+0 5
+http://localhost:3001/
+0 20
+https://timviecits.id.vn/api/v1/freelancer/job
+0 1
+http://localhost:3000/
+0 11372
+# End Of Table - referrers
+# -agents- 
+WhatsApp/2.22.23.5 i
+0 2
+Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0
+0 1
+Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)
+0 2
+Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36
+0 1241
+Mozilla/5.0 (compatible; Let's Encrypt validation server; +https://www.letsencrypt.org)
+0 54
+Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.94 Mobile 
+0 8
+Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+0 9
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+0 5041
+PostmanRuntime/7.37.0
+0 55
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36
+0 8
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0
+0 3580
+Go-http-client/1.1
+0 2
+Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.19
+0 22
+Mozilla/5.0 (iPhone; CPU iPhone OS 17_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Mobile/15E14
+0 3
+PostmanRuntime/7.37.3
+0 491
+facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php) _zbot
+0 3
+Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39
+0 2
+Expo/1017599 CFNetwork/1492.0.1 Darwin/23.3.0
+0 1125
+node
+0 104
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Postman/10.24.3 Electron/20.3.11 Safari/537.
+0 1
+Mozilla/5.0 (Windows NT 6.1; WOW64) SkypeUriPreview Preview/0.5 skype-url-preview@microsoft.com
+0 2
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
+0 25
+undici
+0 675
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
+0 3484
+okhttp/4.9.2
+0 75
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
+0 2
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36
+0 2
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.1
+0 2
+curl/7.29.0
+0 8
+# End Of Table - agents
+# -search strings- 
+# End Of Table - search strings
+# -usernames- 
+# End Of Table - usernames

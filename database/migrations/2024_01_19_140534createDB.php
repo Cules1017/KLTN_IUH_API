@@ -12,13 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         //Bảng độc lập
-        Schema::create('bank_accounts', function (Blueprint $table) {
+        Schema::create('majors', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->float('account_number');
-            $table->integer('status');
-            $table->string('bank_name');
-            $table->enum('account_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
+            $table->string('title_major');
             $table->timestamps();
         });
         Schema::create('admin', function (Blueprint $table) {
@@ -39,11 +35,9 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('otp')->nullable();
             $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         Schema::create('client', function (Blueprint $table) {
             $table->id();
@@ -58,16 +52,15 @@ return new class extends Migration
             $table->string('company_name')->nullable();
             $table->string('introduce')->nullable();
             $table->string('avatar_url')->nullable();
+            $table->string('citizen_identification_url')->nullable();
+            $table->string('citizen_identification_id')->nullable();
+            $table->enum('is_completed_profile',[0,1])->default(0);
             $table->integer('status')->default(1);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('google_id')->nullable();
-            $table->string('otp')->nullable();
-            $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         Schema::create('freelancer', function (Blueprint $table) {
             $table->id();
@@ -84,16 +77,13 @@ return new class extends Migration
             $table->integer('sex')->nullable();
             $table->string('intro')->nullable();
             $table->string('avatar_url')->nullable();
-            $table->float('expected_salary')->nullable();
-            $table->float('available_proposal')->nullable();
             $table->integer('status')->default(1);
+            $table->string('citizen_identification_url')->nullable();
+            $table->string('citizen_identification_id')->nullable();
+            $table->enum('is_completed_profile',[0,1])->default(0);
             $table->string('google_id')->nullable();
-            $table->string('otp')->nullable();
-            $table->dateTime('otp_exp')->nullable();
-            $table->unsignedBigInteger('bank_account')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->foreign('bank_account')->references('id')->on('bank_accounts')->onDelete('cascade');
         });
         
         Schema::create('systerm_config', function (Blueprint $table) {
@@ -117,10 +107,10 @@ return new class extends Migration
             $table->string('title');
             $table->string('desc');
             $table->string('content');
+            $table->string('content_file');
             $table->string('thumbnail');
             $table->float('bids');
             $table->integer('status');
-            $table->integer('min_proposals');
             $table->dateTime('deadline');
             $table->timestamps();
             // Ràng buộc khóa ngoại
@@ -130,7 +120,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('job_id');
             $table->unsignedBigInteger('skill_id');
-            $table->integer('skill_points');
             $table->timestamps();
              // Ràng buộc khóa ngoại tới bảng jobs
              $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
@@ -142,7 +131,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('freelancer_id');
             $table->unsignedBigInteger('skill_id');
-            $table->integer('skill_points');
             $table->timestamps();
              // Ràng buộc khóa ngoại tới bảng freelancer
              $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
@@ -150,11 +138,23 @@ return new class extends Migration
              // Ràng buộc khóa ngoại tới bảng skills
              $table->foreign('skill_id')->references('id')->on('skills')->onDelete('cascade');
         });
+        Schema::create('major_freelancer_map', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('freelancer_id');
+            $table->unsignedBigInteger('major_id');
+            $table->timestamps();
+             // Ràng buộc khóa ngoại tới bảng freelancer
+             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
+
+             // Ràng buộc khóa ngoại tới bảng skills
+             $table->foreign('major_id')->references('id')->on('majors')->onDelete('cascade');
+        });
         Schema::create('candidate_apply_job', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('job_id');
             $table->unsignedBigInteger('freelancer_id');
-            $table->string('cv_url')->nullable();
+            $table->string('attachment_url')->nullable();
+            $table->text('cover_letter')->nullable();
             $table->integer('status');
             $table->timestamps();
 
@@ -169,8 +169,9 @@ return new class extends Migration
             $table->unsignedBigInteger('job_id');
             $table->string('name');
             $table->string('desc');
-            $table->integer('status');
-            $table->integer('confirm_status');
+            $table->integer('priority')->default(0);
+            $table->integer('status')->default(0);;
+            $table->integer('confirm_status')->default(0);
             $table->dateTime('deadline');
             $table->timestamps();
 
@@ -182,6 +183,8 @@ return new class extends Migration
             $table->unsignedBigInteger('job_id');
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('freelancer_id');
+            $table->string('title')->nullable();
+            $table->text('mail_invite')->nullable();
             $table->integer('status');
             $table->timestamps();
 
@@ -214,89 +217,47 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->string('type_user');
-            $table->integer('noti_type');
             $table->string('title');
             $table->string('message');
-            $table->dateTime('time_push');
             $table->string('image');
             $table->string('linkable');
             $table->integer('is_read');
             $table->timestamps();
         });
-        Schema::create('contracts', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('job_id');
-            $table->unsignedBigInteger('freelancer_id');
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
-            $table->float('total_amount');
-            $table->integer('status');
-            $table->timestamps();
-            // Ràng buộc khóa ngoại tới bảng jobs
-            $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
-
-            // Ràng buộc khóa ngoại tới bảng skills
-            $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
-        });
+        
         Schema::create('feedbacks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('contract_id');
             $table->unsignedBigInteger('client_id');
             $table->integer('rate');
-            $table->integer('comment');
+            $table->text('comment');
             $table->integer('status');
             $table->timestamps();
-
-             // Ràng buộc khóa ngoại tới bảng jobs
-             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
-
              // Ràng buộc khóa ngoại tới bảng skills
              $table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
         });
-        Schema::create('hash_contracts', function (Blueprint $table) {
+        Schema::create('my_list', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('contract_id');
-            $table->string('hash');
-            $table->timestamps();
-            // Ràng buộc khóa ngoại tới bảng jobs
-            $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
-        });
-        Schema::create('payments', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('contract_id');
-            $table->unsignedBigInteger('admin_id');
-            $table->float('amount');
+            $table->unsignedBigInteger('job_id');
+            $table->unsignedBigInteger('freelancer_id');
+            $table->integer('user_id');
+            $table->string('type_user');
             $table->integer('status');
-            $table->string('code');
-            $table->dateTime('payment_date');
-            $table->enum('payment_type', ['momo', 'banking', 'vnpay'])->default('vnpay');
             $table->timestamps();
-
-            $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
-            $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
+            $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
+        });
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('task_id');
+            $table->enum('type',['text','file']);
+            $table->text('content');
+            $table->integer('user_id');
+            $table->string('type_user');
+            $table->timestamps();
+            $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
         });
         
-        // Schema::create('documents', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->integer('user_id');
-        //     $table->integer('type_user');
-        //     $table->integer('type_document');
-        //     $table->timestamps();
-        // });
-        // Schema::create('campain_ads', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->integer('type_user');
-        //     $table->string('title');
-        //     $table->string('message');
-        //     $table->string('images');
-        //     $table->string('ads_type');
-        //     $table->string('time_range');
-        //     $table->string('linkable');
-        //     $table->string('position');
-        //     $table->integer('status');
-        //     $table->integer('type_document');
-        //     $table->timestamps();
-        // });
+        
+        
     }
 
     /**

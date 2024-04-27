@@ -68,7 +68,9 @@ class FreelancerService implements IFreelancerService
         try {
             $admin = Freelancer::findOrFail($id);
             $skill = $attribute['skill'];
+            $major=$attribute['majors'];
             unset($attribute['skill']);
+            unset($attribute['majors']);
 
             //xử lý thêm skill
             if ($skill && count($skill) > 0) {
@@ -81,16 +83,31 @@ class FreelancerService implements IFreelancerService
                     ]);
                 }
             }
+            $majorIds = $major?explode(',', $major):[];
+            if(count($majorIds)>0)DB::table('major_freelancer_map')->where('freelancer_id', $admin->id)->delete();
+            foreach ($majorIds as $majorId) {
+                $tmp = DB::table('major_freelancer_map')->insert([
+                    'freelancer_id' => $admin->id,
+                    'major_id' => $majorId,
+                ]);
+            }
 
 
+            if(count($attribute)>0)
+                $admin->update($attribute);
 
-            $admin->update($attribute);
-            $admin['skills'] = DB::table('skill_freelancer_map')
+            $result=Freelancer::find($id)->toArray();
+            $result['skills'] = DB::table('skill_freelancer_map')
                 ->join('skills', 'skill_freelancer_map.skill_id', '=', 'skills.id')
                 ->where('skill_freelancer_map.freelancer_id', '=', $admin->id)
                 ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_freelancer_map.skill_points')
                 ->get();
-            return  $admin;
+            $result['majors'] = DB::table('major_freelancer_map')
+                ->join('majors', 'major_freelancer_map.major_id', '=', 'majors.id')
+                ->where('major_freelancer_map.freelancer_id', '=', $admin->id)
+                ->select('majors.id as major_id','majors.title_major')
+                ->get();
+            return  $result;
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }
@@ -116,7 +133,122 @@ class FreelancerService implements IFreelancerService
                 ->where('skill_freelancer_map.freelancer_id', '=', $admin->id)
                 ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_freelancer_map.skill_points')
                 ->get();
+            $admin['majors'] = DB::table('major_freelancer_map')
+                ->join('majors', 'major_freelancer_map.major_id', '=', 'majors.id')
+                ->where('major_freelancer_map.freelancer_id', '=', $admin->id)
+                ->select('majors.id as major_id','majors.title_major')
+                ->get();
             return $admin;
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage(), null, 400);
+        }
+    }
+    public function autoGetFreelancer($page, $num)
+    {
+
+
+        try {
+            global $user_info;
+            $currentUserJobs = Job::where('client_id', $user_info->id)->get();
+            $relatedSkills = [];
+            if($currentUserJobs!=null)
+            foreach ($currentUserJobs as $job) {
+                $jobSkills = DB::table('skill_job_map')
+                    ->where('job_id', $job->id)
+                    ->pluck('skill_id')
+                    ->toArray();
+                $relatedSkills = array_merge($relatedSkills, $jobSkills);
+            }
+            $relatedSkills = array_unique($relatedSkills);
+
+            // Lấy danh sách freelancer có kỹ năng liên quan
+            $freelancers = DB::table('freelancer')
+                ->join('skill_freelancer_map', 'freelancer.id', '=', 'skill_freelancer_map.freelancer_id')
+                ->whereIn('skill_freelancer_map.skill_id', $relatedSkills)
+                ->select('freelancer.*')
+                ->distinct()
+                ->paginate($num);
+
+            return [
+                'data' => $freelancers->items(),
+                'total' => $freelancers->total(),
+                'total_page' => $freelancers->lastPage(),
+                'num' => $num,
+                'current_page' => $page,
+            ];
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage(), null, 400);
+        }
+    }
+    public function searchListFreelancer($page, $num, $keyword, $skills,$majors, $date_of_birth, $expected_salary, $sex)
+    {
+        try {
+            // Bắt đầu truy vấn
+            $query = DB::table('freelancer');
+
+            // Tìm kiếm theo từ khóa
+            if (!empty($keyword)) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('intro', 'LIKE', "%$keyword%")
+                        ->orWhere('address', 'LIKE', "%$keyword%");
+                });
+            }
+
+            // Tìm kiếm theo kỹ năng
+            if (!empty($skills)) {
+                $skillIds = explode(',', $skills);
+                $query->join('skill_freelancer_map', 'freelancer.id', '=', 'skill_freelancer_map.freelancer_id')
+                    ->whereIn('skill_freelancer_map.skill_id', $skillIds);
+            }
+
+            if (!empty($majors)) {
+                $$majorIds = explode(',', $majors);
+                $query->join('major_freelancer_map', 'freelancer.id', '=', 'major_freelancer_map.freelancer_id')
+                    ->whereIn('major_freelancer_map.major_id', $skillIds);
+            }
+
+            // Tìm kiếm theo ngày sinh
+            
+            if (!empty($date_of_birth)) {
+                $deadlineRange = explode(',', $date_of_birth);
+                if (count($deadlineRange) === 2) {
+                    $query->whereBetween('date_of_birth', [$deadlineRange[0], $deadlineRange[1]]);
+                }
+            }
+
+            // Tìm kiếm theo mức lương mong đợi
+            if (!empty($expected_salary)) {
+                $salaries = explode(',', $expected_salary);
+                $query->whereBetween('expected_salary', $salaries);
+            }
+
+            // Tìm kiếm theo giới tính
+            if (!empty($sex)) {
+                $query->where('sex', $sex);
+            }
+
+            // Thực hiện phân trang
+            $freelancers = $query->select('freelancer.*')->distinct()
+                ->paginate($num, ['*'], 'page', $page);
+            $data=[];
+            foreach($freelancers->items()as $freelancer){
+                unset($freelancer->password);
+                unset($freelancer->email_verified_at);
+                $freelancer->skill=DB::table('skills')->select('skills.*')
+                ->join('skill_freelancer_map', 'skills.id', '=', 'skill_freelancer_map.skill_id')->where('skill_freelancer_map.freelancer_id',"=",$freelancer->id)->get();
+                $freelancer->major=DB::table('majors')->select('majors.*')
+                ->join('major_freelancer_map', 'majors.id', '=', 'major_freelancer_map.major_id')->where('major_freelancer_map.freelancer_id',"=",$freelancer->id)->get();
+
+                $data[] = $freelancer;
+            }
+            shuffle($data);
+            return [
+                'data' => $data,
+                'total' => $freelancers->total(),
+                'total_page' => $freelancers->lastPage(),
+                'num' => $num,
+                'current_page' => $page,
+            ];
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage(), null, 400);
         }

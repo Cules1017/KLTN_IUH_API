@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\MyList;
 
 class FreelancerController extends Controller
 {
@@ -92,6 +93,7 @@ class FreelancerController extends Controller
             'expected_salary' => 'nullable|float',
             'intro' => 'nullable|string',
             'bank_account' => 'nullable|exists:bank_accounts,id',
+            'is_completed_profile'=>'nullable|integer'
         ];
 
         // Custom error messages
@@ -106,19 +108,51 @@ class FreelancerController extends Controller
             'exists' => 'Trường :attribute không tồn tại.',
             'in' => 'Trường :attribute không hợp lệ.',
         ];
-        $imagePath = '';
+        $imagePath = $request->avatar_url;
         if ($request->hasFile('avatar')) {
             $imagePath = FileHelper::saveImage($request->file('avatar'), 'client', 'avatar');
         }
         $skill=$request->skill;
-
-        $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath,'skill'=>$skill]), $rules, $messages);
+        $majors=$request->majors;
+        $validator=[];
+        if($imagePath!=null)
+            $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath,'skill'=>$skill]), $rules, $messages);
+        else
+            $validator = Validator::make(array_merge($rq, ['skill'=>$skill]), $rules, $messages);
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
         $validator = $validator->validated();
-        $data=$this->freelancerService->updateAtribute($id,array_merge($validator,['avatar_url' => $imagePath,'skill'=>$skill]));
+        $data=$this->freelancerService->updateAtribute($id,array_merge($validator,['avatar_url' => $imagePath,'skill'=>$skill,'majors'=>$majors]));
         return $this->sendOkResponse($data);    
 
+    }
+
+    public function AddJob($id, Request $request){
+        global $user_info;
+        $mid = $user_info->id;
+        $userType=$user_info->user_type;
+        $arrayInsert=['type_user'=>$userType,'user_id'=>$mid];
+        if($userType=='freelancer'){
+            $arrayInsert=array_merge($arrayInsert,['job_id'=>$id]);
+        }else{
+            $arrayInsert=array_merge($arrayInsert,['freelancer'=>$id]);
+        }
+        $iExist=MyList::where($arrayInsert)->get()->toArray();
+        if(count($iExist)>0){
+            MyList::where($arrayInsert)->delete();
+            return $this->sendOkResponse('Đã xóa thành công khỏi list của bạn.'); 
+        }
+        $data=MyList::create($arrayInsert);
+        return $this->sendOkResponse('Đã thêm thành công vào list của bạn.'); 
+    }
+
+    public function GetMyJob(){
+        global $user_info;
+        $mid = $user_info->id;
+        $userType=$user_info->user_type;
+        $arrayInsert=['type_user'=>$userType,'user_id'=>$mid];
+        $iExist=MyList::where($arrayInsert)->get()->toArray();
+        return $this->sendOkResponse($iExist);
     }
 }

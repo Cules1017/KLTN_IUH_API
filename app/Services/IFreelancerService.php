@@ -9,4 +9,6 @@ interface IFreelancerService
     public function updateAtribute($id,$attribute);
     public function destroy($id);
     public function getById($id);
+    public function autoGetFreelancer($page,$num);
+    public function searchListFreelancer($page,$num,$keyword, $skills,$majors, $date_of_birth, $expected_salary, $sex);
 }

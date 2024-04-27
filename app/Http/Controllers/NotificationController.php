@@ -7,6 +7,10 @@ use App\Services\INotificationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\Admin;
+use App\Models\Client;
+use App\Models\Freelancer;
+use App\Models\Notifications;
 
 class NotificationController extends Controller
 {
@@ -20,6 +24,13 @@ class NotificationController extends Controller
         $data=$this->notiService->getMyNotifications();
         return $this->sendOkResponse($data);
     }
+
+    public function seen($id){
+        $noti=Notifications::find($id);
+        $noti->is_read=1;
+        $noti->save();
+        return $this->sendOkResponse($noti);
+    }
     public function store(Request $request){
         $rules = [
             'title' => ['required', 'string'],
@@ -27,6 +38,8 @@ class NotificationController extends Controller
             'time_push'=> ['string'],
             'image' => ['string', 'nullable', 'regex:/^(http(s)?:\/\/.*\.(png|jpg|jpeg|gif|bmp))$/i'],
             'linkable' => ['required','string'],
+            'user_type'=>['required','string'],
+            'user_id'=>['required'],
         ];
         $messages = [
             'required' => 'Trường :attribute là bắt buộc.',
@@ -41,7 +54,20 @@ class NotificationController extends Controller
             $imagePath = FileHelper::saveImage($request->file('imagefile'), 'noti', 'noti_image');
             $validator['image'] = $imagePath;
         }
-        $data = $this->notiService->createNoti($validator,$request->smail);
+        $user_info=null;
+        if($request->user_type=='client'){
+            $user_info=Client::find($request->user_id);
+        }elseif($request->user_type=='freelancer'){
+            $user_info=Freelancer::find($request->user_id);
+        }else{
+            $user_info=Admin::find($request->user_id);
+        }
+        if($user_info==null) return $this->sendFailedResponse("Không tồn tại user push noti");
+        unset($validator['user_id']);
+        unset($validator['user_type']);
+
+        $user_info->user_type=$request->user_type;
+        $data = $this->notiService->pushNotitoUser($user_info,$validator,$request->smail);
         return $this->sendOkResponse($data);
     }
 

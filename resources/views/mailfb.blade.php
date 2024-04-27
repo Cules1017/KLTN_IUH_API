@@ -8,7 +8,7 @@
 
         <div>
             aloalaoalaaooa.{{$token}}<br/>
-            <a href="http://127.0.0.1:8000/api/v1/verify?token={{$token}}">Verify</a>
+            <a href="https://timviecits.id.vn/api/v1/verify?token={{$token}}">Verify</a>
 
         </div>
 

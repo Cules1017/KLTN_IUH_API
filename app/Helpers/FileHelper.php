@@ -18,11 +18,11 @@ class FileHelper
     public static function saveImage(UploadedFile $file, $directory = 'avatars', $prefix = 'avatar')
     {
         // Tạo tên tệp mới để tránh trùng lặp
-        $fileName = $prefix . '_' . time() . '.' . $file->getClientOriginalExtension();
+        //$fileName = $prefix . '_' . time() . '.' . $file->getClientOriginalExtension();
 
         // Lưu hình ảnh vào thư mục công cộng
-        $path = $file->storeAs("public/{$directory}", $fileName);
-
+        //$path = $file->storeAs("public/{$directory}", $fileName);
+        $path=$file->store($directory, ['disk' => 'ftp']);
         // Trả về đường dẫn đầy đủ
         return asset(Storage::url($path));
     }

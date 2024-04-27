@@ -16,6 +16,12 @@ use Illuminate\Validation\Rule;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Token;
+use App\Helpers\MyHelper;
+use Illuminate\Support\Facades\DB;
+use App\Events\OtpEvent;
+use GuzzleHttp\Client as ClientApi;
+use App\Helpers\FileHelper;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -67,7 +73,7 @@ class AuthController extends Controller
             $userType = 'freelancer';
         //dd(Auth::guard('client')->attempt($validator->validated()),Auth::guard('admin')->attempt($validator->validated()),!(Auth::guard('client')->attempt($validator->validated())&&Auth::guard('admin')->attempt($validator->validated())));
         if ($userType == null) {
-            return $this->sendFailedResponse('Unauthorized', -1, null, 401);
+            return $this->sendFailedResponse('Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra và thao tác lại.', -1, null, 200);
         }
         $customClaims = [
             'user_type' => $userType,
@@ -75,7 +81,7 @@ class AuthController extends Controller
             // Add any other additional claims you want to include
         ];
         if (Auth::guard($userType)->user()->email_verified_at == null) {
-            return $this->sendFailedResponse('Vui lòng xác thực email trước khi login.', -1, null, 401);
+            return $this->sendFailedResponse('Vui lòng xác thực email trước khi login.', -1, null, 200);
         }
         $token = JWTAuth::customClaims($customClaims)->fromUser(Auth::guard($userType)->user());
 
@@ -256,10 +262,14 @@ class AuthController extends Controller
      */
     protected function createNewToken($token, $typeUser = 'admin', $userInfo = null)
     {
+        if($typeUser=='freelancer')
+        $userInfo->skill=DB::table('skills')->select('skills.*')
+                ->join('skill_freelancer_map', 'skills.id', '=', 'skill_freelancer_map.skill_id')->where('skill_freelancer_map.freelancer_id',"=",$userInfo->id)->get()->toArray();
+
         return $this->sendOkResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth($typeUser)->factory()->getTTL() * 60,
+            'expires_in' => auth($typeUser)->factory()->getTTL() * 6000*30000,
             'user_type' => $typeUser,
             'user' => $userInfo,
         ]);
@@ -302,7 +312,7 @@ class AuthController extends Controller
                     // Add any other additional claims you want to include
                 ];
                 $token = JWTAuth::customClaims($customClaims)->fromUser($finduser);
-                auth('freelancer')->factory()->getTTL() * 60;
+                auth('freelancer')->factory()->getTTL() * 600000*30000;
                 return redirect(env('FRONTEND_URL') . 'auth/google?token=' . $token);
             } else {
                 if ($userExist) {
@@ -325,7 +335,7 @@ class AuthController extends Controller
                     // Add any other additional claims you want to include
                 ];
                 $token = JWTAuth::customClaims($customClaims)->fromUser($newUser);
-                auth('freelancer')->factory()->getTTL() * 60;
+                auth('freelancer')->factory()->getTTL() * 600000*30000;
                 //return $this->createNewToken($token);
 
                 return redirect(env('FRONTEND_URL') . 'auth/google?token=' . $token);
@@ -333,5 +343,124 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return redirect(env('FRONTEND_URL') . 'login');
         }
+    }
+
+    public function getInfoUserById(Request $request){
+        $rq = MyHelper::convertKeysToSnakeCase($request->all());
+        $validator = Validator::make($rq, [
+            'id'=>'required',
+            'type_user' => 'required|string|in:freelancer,admin,client'
+        ]);
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors()->toJson(), -1, null, 422, $validator->errors());
+        }
+        $dataResult=null;
+        $validator = $validator->validated();
+        if($validator['type_user']=='admin'){
+            $dataResult['base_info']= Admin::find($validator['id']);
+            
+        }
+        elseif($validator['type_user']=='client'){
+            $dataResult['base_info']=Client::find($validator['id']);
+            $dataResult['job']=DB::select('select * FROM jobs WHERE client_id ='.$validator['id']);
+        }
+        else{
+            $dataResult['base_info']=Freelancer::find($validator['id']);
+            $dataResult['job']=DB::select('select a.status as status_apply,b.* FROM candidate_apply_job a, jobs b WHERE a.job_id = b.id AND a.freelancer_id ='.$validator['id']);
+            $dataResult['experience']= DB::select('SELECT DISTINCT k.id, k.name '.
+            'FROM skill_job_map sm, skills k '.
+            'WHERE sm.skill_id= k.id AND sm.job_id IN('.
+            'select b.id FROM candidate_apply_job a, jobs b WHERE a.job_id = b.id AND a.freelancer_id ='.$validator['id'].')'
+        );   
+        }
+        if($dataResult==null) return $this->sendBadRequestResponse('không tìm thấy thông tin user');
+        return $this->sendOkResponse($dataResult);
+    }
+
+    public function sendOtp(){
+        global $user_info;
+        $otp = "";
+        for ($i = 0; $i < 6; $i++) {
+            $otp .= rand(0, 9);
+        }
+        
+        Mail::send('mailnoti', ['title' => "MÃ XÁC THỰC",'message_mail'=>'Mã xác thực của bạn là: '.$otp.'. Mã xác thực của bạn sẽ có hiệu lực trong 3 phút.'], function ($message) use ($user_info) {
+            $message->to($user_info->email, $user_info->first_name)->subject("MÃ XÁC THỰC");
+        });
+        Session::put('otp', $otp);
+        Session::put('otp_expiry', strtotime('+3 minutes', time()));
+        event(new OtpEvent($otp,strtotime('+3 minutes', time()),$user_info->id,$user_info->user_type));
+        return $this->sendOkResponse([],'Đã gởi mã xác thực qua email!');
+    }
+    public function verifyOtp(Request $request){
+        global $user_info;
+        $otp = $request->input('otp');
+        $storedOTP = Session::get('otp');
+        $expiryTime = Session::get('otp_expiry');
+        if ($expiryTime>=time() && $otp == $storedOTP) {
+            return $this->sendOkResponse('Mã OTP hợp lệ.','Mã OTP hợp lệ.',0);
+        } else {
+            if($otp != $storedOTP){
+                return $this->sendOkResponse('Mã OTP không hợp lệ. Vui lòng kiểm tra lại hoặc chọn gởi OTP để nhận mã mới.','Mã OTP không hợp lệ. Vui lòng kiểm tra lại hoặc chọn gởi OTP để nhận mã mới.',-1);
+            }else{
+                return $this->sendOkResponse('Mã OTP hết hạn.Vui lòng chọn gởi OTP để nhận mã mới.','Mã OTP hết hạn. Vui lòng chọn gởi OTP để nhận mã mới',-1);
+            }
+        }
+        
+        
+        return $this->sendOkResponse([],'Đã gởi mã xác thực qua email!');
+    }
+
+
+    public function CitizenIdentificationCardVerify(Request $request){
+        global $user_info;
+        $user_id = $user_info->id;
+        $user_type= $user_info->user_type;
+        $imagePath='';
+        if ($request->hasFile('image')) {
+            $imagePath = FileHelper::saveImage($request->file('image'), 'CitizenIdentificationCard', 'avatar');
+        }
+        else{
+            return $this->sendFailedResponse('Vui lòng truyền lên hình ảnh căn cước công dân', -1, null, 422,'Vui lòng truyền lên hình ảnh căn cước công dân');
+        }
+        try{
+            $client = new ClientApi();
+    
+            $response = $client->request('POST', 'https://api.fpt.ai/vision/idr/vnm', [
+                'headers' => [
+                    'api-key' => 'Ns7sD8TTu1kPNx9Em287lSANE69ce2qR',
+                ],
+                'multipart' => [
+                    [
+                        'name' => 'image',
+                        'contents' => fopen($imagePath, 'r'),
+                    ],
+                ],
+            ]);
+            $resultCallApi=json_decode($response->getBody()->getContents());
+        
+            $dataInsert=[
+                "address"=>$resultCallApi->data[0]->address,
+                "date_of_birth"=>\Carbon\Carbon::createFromFormat('d/m/Y',$resultCallApi->data[0]->dob )->toDateString(),
+                "citizen_identification_id"=>$resultCallApi->data[0]->id,
+                "citizen_identification_url"=>$imagePath,
+                "sex"=>$resultCallApi->data[0]->sex=="NỮ"?1:0,
+                "is_completed_profile"=>1,
+            ];
+        }catch(\Exception $e){
+             return $this->sendFailedResponse('Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.', -1, null, 400,'Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.');
+        }
+        
+
+        $userUpdate=null;
+        if($user_type=='freelancer'){
+            $userUpdate=Freelancer::find($user_id)->update($dataInsert);
+            $userUpdate=Freelancer::find($user_id);
+        }
+        else{
+            $userUpdate=Client::find($user_id)->update($dataInsert);
+            $userUpdate=Client::find($user_id);
+        }
+        return $this->sendOkResponse($userUpdate,'Xác thực thông tin thành công!');
     }
 }

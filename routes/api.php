@@ -17,6 +17,7 @@ use App\Models\Skill;
 use App\Services\JobService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,11 +29,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
 Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Controllers','middleware' => ['logmd']], function () {
     Route::group(
         ['middleware' => ['api']],
         function () {
+            Route::post('/send-otp', 'AuthController@sendOtp')->middleware('checktoken');
+            Route::post('/verify-otp', 'AuthController@verifyOtp')->middleware('checktoken');
+            Route::post('/verify-citizen-identification-card', 'AuthController@CitizenIdentificationCardVerify')->middleware('checktoken');
             Route::post('/login', 'AuthController@login')->name('login');
             Route::post('/register', 'AuthController@register')->name('register');
             Route::get('/verify', 'AuthController@VerifyCodeEmail')->name('VerifyCodeEmail');
@@ -40,6 +43,9 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::get('/google-callback', 'AuthController@handleGoogleCallback');
         }
     );
+    Route::get('/linkstorage', function () {
+        dd(public_path('../'));
+    });
     Route::group(
         ['prefix' => 'administrator', 'middleware' => 'checktoken'], //
         function () {
@@ -57,12 +63,13 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::group(
                 ['prefix' => 'skill', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
-                    Route::get('', [SkillController::class, 'index']);
+                    //Route::get('', [SkillController::class, 'index']);
                     Route::post('', [SkillController::class, 'store']);
                     Route::put('{id}', [SkillController::class, 'update']);
                     Route::delete('{id}', [SkillController::class, 'destroy']);
                 }
             );
+            Route::get('skill', [SkillController::class, 'index']);
             Route::group(
                 ['prefix' => 'client', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
@@ -122,12 +129,13 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 ['prefix' => 'job', 'middleware' => ['isClient']],
                 function () {
                     Route::get('/my-jobs', [JobController::class, 'getMyPost']);
-                    Route::post('/create-jobs', [JobController::class, 'createNewPost']);
+                    Route::post('/create-job', [JobController::class, 'createNewPost']);
                     Route::post('/update-jobs/{id}', [JobController::class, 'updateForClient']);
                     Route::delete('{id}', [JobController::class, 'destroy']);
-                    Route::post('/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
+                    
                 }
             );
+            Route::post('job/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
             Route::group(
                 ['prefix' => 'freelancers', 'middleware' => ['isClient']],
                 function () {
@@ -139,13 +147,20 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                     Route::post('/{id}/recruit-confirm', [JobController::class, 'recruitmentConfirmation']);
                 }
             );
+            Route::group(
+                ['prefix' => 'invite', 'middleware' => ['isFreelancer']],
+                function () {
+                    Route::post('/accept/{id}', [ClientController::class, 'acceptJob']);
+                    Route::get('/list', [ClientController::class, 'getListInvite']);
+                }
+            );
         }
     );
     Route::group(
         ['prefix' => 'freelancer', 'middleware' => 'checktoken'], //
         function () {
             Route::group(
-                ['prefix' => 'info', 'middleware' => ['isFreelancer']],
+                ['prefix' => 'info','middleware' => ['isFreelancer']],
                 function () {
                     Route::post('update', [FreelancerController::class, 'updateForFreelancer']);
                     Route::get('', [FreelancerController::class, 'getInfoUser']);
@@ -171,6 +186,9 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::post('/task/{id}/set-status', [JobController::class, 'freelancerSetStatus'])->middleware('isFreelancer');
             Route::post('/task/{id}/confirm-status', [JobController::class, 'clientConfirmStatus'])->middleware('isClient');
             Route::delete('/task/{id}', [JobController::class, 'destroyTask'])->middleware('isClient');
+            Route::put('/task/{id}', [JobController::class, 'editTask']);
+            Route::post('/task/{id}/add-cmt-task', [JobController::class, 'addCommentTask']);
+            Route::delete('/task/{id}/delete-cmt-task', [JobController::class, 'deleteCommentTask']);
         }
     );
     Route::group(
@@ -179,6 +197,7 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::get('', [NotificationController::class, 'index']);
             Route::post('', [NotificationController::class, 'store']);
             Route::put('/{id}', [NotificationController::class, 'update']);
+            Route::put('/{id}/seen', [NotificationController::class, 'seen']);
         }
     );
     Route::group(
@@ -190,5 +209,14 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::post('send-message', [ChatController::class, 'sendMessage']);
         }
     );
+    Route::group(
+        ['prefix' => 'mylist', 'middleware' => 'checktoken'], //
+        function () {
+            Route::post('/{id}', [FreelancerController::class, 'AddJob']);
+            Route::get('/', [FreelancerController::class, 'GetMyJob']);
+        }
+    );
+    Route::get('majors',[ClientController::class, 'getMajors'])->middleware('checktoken');
+    Route::get('info-user','AuthController@getInfoUserById')->middleware('checktoken');
  
 });

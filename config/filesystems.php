@@ -32,7 +32,7 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => storage_path('app').'/public_html/storage',
             'throw' => false,
         ],
 
@@ -55,6 +55,18 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+        'ftp' => [
+            'driver'   => 'ftp',
+            'host'     => '112.213.89.118',
+            'username' => 'timvieci65fb',
+            'password' => 'bH6N8R5wXhj2',
+            //Các thông số mở rộng
+            'port'     => 21,
+            'root'     => 'public_html/storage',
+            'passive'  => true,
+            'ssl'      => true,
+            'timeout'  => 30,
+        ]
 
     ],
 
@@ -70,7 +82,7 @@ return [
     */
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage') => storage_path('app/public_html'),
     ],
 
 ];

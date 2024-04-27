@@ -22,8 +22,7 @@ class JobService implements IJobService
                 foreach ($skill as $i) {
                     $tmp = DB::table('skill_job_map')->insert([
                         'job_id' => $data->id,
-                        'skill_id' => $i['skill_id'],
-                        'skill_points' => $i['point'],
+                        'skill_id' => $i
                     ]);
                 }
             }
@@ -31,7 +30,7 @@ class JobService implements IJobService
             $data['skills'] = DB::table('skill_job_map')
                 ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
                 ->where('skill_job_map.job_id', '=', $data->id)
-                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name')
                 ->get();;
             return  $data;
         } catch (Throwable $e) {
@@ -53,8 +52,7 @@ class JobService implements IJobService
                 foreach ($skill as $i) {
                     $tmp = DB::table('skill_job_map')->insert([
                         'job_id' => $data->id,
-                        'skill_id' => $i['skill_id'],
-                        'skill_points' => $i['point'],
+                        'skill_id' => $i
                     ]);
                 }
             }
@@ -62,7 +60,7 @@ class JobService implements IJobService
             $data['skills'] = DB::table('skill_job_map')
                 ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
                 ->where('skill_job_map.job_id', '=', $data->id)
-                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name', 'skill_job_map.skill_points')
+                ->select('skills.id as skill_id', 'skills.desc as skill_desc', 'skills.name as skill_name')
                 ->get();;
             return  $data;
         } catch (Throwable $e) {
@@ -137,6 +135,7 @@ class JobService implements IJobService
             foreach ($attributes as $index => $attribute) {
                 $query->where($attribute, $values[$index]);
             }
+            $query->orderBy('updated_at', 'desc');
 
             // Thực hiện truy vấn và lấy kết quả
             $total = $query->count();
@@ -186,6 +185,7 @@ class JobService implements IJobService
     public function getById($id)
     {
         $data = Job::find($id);
+        if($data==null)return [];
         $data['skills'] = DB::table('skill_job_map')
             ->join('skills', 'skill_job_map.skill_id', '=', 'skills.id')
             ->where('skill_job_map.job_id', '=', $data->id)
@@ -258,7 +258,7 @@ class JobService implements IJobService
     //     // ];
     // }
     public function getListJobForFreelancer($page = 1, $perPage = 10)
-    {
+    { 
         $page = $page ? $page : 1;
         $perPage = $perPage ? $perPage : 10;
         global $user_info;
@@ -280,14 +280,15 @@ class JobService implements IJobService
         $allSkills = [];
 
         $orderByExpression = implode(',', $skillIds);
+        if(count($skillIds)==0)
+            $orderByExpression=0;
         $jobs = DB::table('jobs')
             ->select('jobs.*')
             ->join('skill_job_map', 'jobs.id', '=', 'skill_job_map.job_id')
-            ->orderByRaw("FIELD(skill_job_map.skill_id, $orderByExpression) DESC")
+            ->orderByRaw("FIELD(skill_job_map.skill_id, ".$orderByExpression.") DESC")
             //->orderBy('skill_job_map.skill_points', 'DESC')
             ->orderByDesc('jobs.created_at')
             ->get();
-
         $filteredJobs = collect([]);
         foreach ($jobs as $job) {
             // Lúc này mới so sánh cùng skill_id thì xếp tiếp skill points
@@ -305,8 +306,13 @@ class JobService implements IJobService
             $page, // Trang hiện tại
             ['path' => LengthAwarePaginator::resolveCurrentPath()] // Link đến trang
         );
+        $data=$paginatedJobs->items();
+        foreach ($data as &$item) {
+            $infoSkill=DB::select("select b.* from skill_job_map a,skills b where a.skill_id=b.id and a.job_id=".$item->id);
+            $item->Skills=$infoSkill;
+        }
         return [
-            'data' => $paginatedJobs->items(),
+            'data' =>array_values($data),
             'total' => $paginatedJobs->total(),
             'total_page' => $paginatedJobs->lastPage(),
             'num' => $paginatedJobs->perPage(),
@@ -381,7 +387,6 @@ class JobService implements IJobService
         $page = $page ? $page : 1;
         $perPage = $perPage ? $perPage : 10;
         $query = Job::query();
-
         // Áp dụng các bộ lọc nếu được truyền vào
         if ($keyword) {
             $query->where(function ($q) use ($keyword) {
@@ -391,14 +396,14 @@ class JobService implements IJobService
             });
         }
 
-        if ($bids) {
+        if (isset($bids)) {
             $bidsRange = explode(',', $bids);
             if (count($bidsRange) === 2) {
                 $query->whereBetween('bids', [$bidsRange[0], $bidsRange[1]]);
             }
         }
 
-        if ($status) {
+        if (isset($status)) {
             $query->where('status', $status);
         }
 
@@ -421,23 +426,25 @@ class JobService implements IJobService
                 $query->whereBetween('deadline', [$deadlineRange[0], $deadlineRange[1]]);
             }
         }
-
         // Lấy tổng số lượng records
         $totalQuery = clone $query;
         $total = $totalQuery->count();
-
+    
         $data = $query->limit($perPage);
 
         if ($page > 1) {
             $data = $data->offset(($page - 1) * $perPage);
         }
-
-        $data = $data->get();
-
+        
+        $data = $data->get()->toArray();
+        foreach ($data as &$item) {
+            $infoSkill=DB::select("select b.* from skill_job_map a,skills b where a.skill_id=b.id and a.job_id=".$item['id']);
+            $item['Skills']=$infoSkill;
+        }
         $totalPage = ceil($total / $perPage);
 
         return [
-            'data' => $data,
+            'data' => (array)$data,
             'total' => $total,
             'total_page' => $totalPage,
             'num' => $perPage,
