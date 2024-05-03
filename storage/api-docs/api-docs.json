@@ -1,0 +1,568 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API IT WORKS",
+        "description": "Tài liệu API cho hệ thống ứng dụng IT WORKS",
+        "contact": {
+            "email": "your-email@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "description": "Authenticate user and generate access token",
+                "operationId": "da2ca4d7a5cdec77b8b45a20373535cb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "userName",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "userName": {
+                                        "type": "string",
+                                        "default": "huyentran"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "default": "abc123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a User",
+                "description": "Register a new user",
+                "operationId": "6796c44e1f6079c411abbfed066c5907",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "userName",
+                                    "email",
+                                    "password",
+                                    "typeUser"
+                                ],
+                                "properties": {
+                                    "userName": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "typeUser": {
+                                        "type": "string",
+                                        "enum": [
+                                            "freelancer",
+                                            "admin",
+                                            "client"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/change-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Change user's password",
+                "description": "Change the password of the authenticated user",
+                "operationId": "ecbc2d9413e372e32fbe5077e50f116d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "old_password",
+                                    "new_password",
+                                    "new_password_confirmation"
+                                ],
+                                "properties": {
+                                    "old_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/google-redirect": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Redirect to Google OAuth",
+                "description": "Redirect the user to Google OAuth flow",
+                "operationId": "4902cdcc9027e469401df974a3a1c8eb",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/api/v1/user-profile": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get user profile",
+                "description": "Get the profile of the authenticated user",
+                "operationId": "9ace791e5c98a9e15bf2586231729dca",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/send-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": " Send Otp",
+                "description": "gởi otp",
+                "operationId": "4bfb3619f2cca29fb054c8262036f7a7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify OTP",
+                "description": "Verify the one-time password (OTP) sent via email",
+                "operationId": "c430465ea3048d858cc16f550eac7110",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "otp": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/citizen-identification-card-verify": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify citizen identification card",
+                "description": "Verify the citizen identification card of the authenticated user",
+                "operationId": "7cb25808e3e242a13faa429f57500d5d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "description": "Image of the citizen identification card",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/clients": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Get list of clients",
+                "operationId": "d00d20521584ab5da83e088abb7aded2",
+                "parameters": [
+                    {
+                        "name": "num",
+                        "in": "query",
+                        "description": "Number of clients per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search value",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Client ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sex",
+                        "in": "query",
+                        "description": "Client's gender",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Client's status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of clients retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiToken": []
+                    }
+                ]
+            }
+        },
+        "/api/freelancer/info": {
+            "get": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Get freelancer's information",
+                "description": "Get freelancer's information.",
+                "operationId": "getFreelancerInfo",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation. Returns the freelancer information."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "403": {
+                        "description": "Forbidden. User does not have permission to perform this action."
+                    }
+                }
+            }
+        },
+        "/api/freelancer/info/update": {
+            "post": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Update freelancer's information",
+                "description": "Update freelancer's information.",
+                "operationId": "updateFreelancerInfo",
+                "requestBody": {
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation. Returns the updated freelancer information."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "403": {
+                        "description": "Forbidden. User does not have permission to perform this action."
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity. Validation error."
+                    }
+                }
+            }
+        },
+        "/api/freelancer/mylist/{id}": {
+            "post": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Add job to freelancer's list",
+                "description": "Add a job to freelancer's list.",
+                "operationId": "addJobToList",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job to add to the list",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation. Returns success message.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Đã thêm thành công vào list của bạn."
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    }
+                }
+            }
+        },
+        "/api/freelancer/mylist": {
+            "get": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Get freelancer's job list",
+                "description": "Get the list of jobs associated with the freelancer.",
+                "operationId": "getFreelancerJobList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation. Returns the list of jobs."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

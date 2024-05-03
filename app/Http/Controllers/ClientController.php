@@ -29,6 +29,76 @@ class ClientController extends Controller
         $this->clientService = $clientService;
         $this->freelancerService = $freelancerService;
     }
+    /**
+ * @OA\Get(
+ *     path="/api/clients",
+ *     summary="Get list of clients",
+ *     tags={"Clients"},
+ *     @OA\Parameter(
+ *         name="num",
+ *         in="query",
+ *         description="Number of clients per page",
+ *         required=false,
+ *         @OA\Schema(type="integer", default=10)
+ *     ),
+ *     @OA\Parameter(
+ *         name="page",
+ *         in="query",
+ *         description="Page number",
+ *         required=false,
+ *         @OA\Schema(type="integer", default=1)
+ *     ),
+ *     @OA\Parameter(
+ *         name="search",
+ *         in="query",
+ *         description="Search value",
+ *         required=false,
+ *         @OA\Schema(type="string")
+ *     ),
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="query",
+ *         description="Client ID",
+ *         required=false,
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Parameter(
+ *         name="sex",
+ *         in="query",
+ *         description="Client's gender",
+ *         required=false,
+ *         @OA\Schema(type="string", enum={"male", "female"})
+ *     ),
+ *     @OA\Parameter(
+ *         name="status",
+ *         in="query",
+ *         description="Client's status",
+ *         required=false,
+ *         @OA\Schema(type="string", enum={"active", "inactive"})
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of clients retrieved successfully",
+ *         @OA\JsonContent(type="object")
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string"),
+ *             @OA\Property(property="errors", type="object")
+ *         )
+ *     ),
+ *     security={{ "apiToken": {} }}
+ * )
+ */
     public function index(Request $request)
     {
         $num = $request->num ? $request->num : 10;

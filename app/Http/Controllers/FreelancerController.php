@@ -68,12 +68,63 @@ class FreelancerController extends Controller
         $this->freelancerService->destroy($id);
         return $this->sendOkResponse();
     }
-    public function getInfoUser(Request $request){
+    /**
+     * @OA\Get(
+     *      path="/api/freelancer/info",
+     *      operationId="getFreelancerInfo",
+     *      tags={"Freelancer"},
+     *      summary="Get freelancer's information",
+     *      description="Get freelancer's information.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation. Returns the freelancer information.",
+     *          
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized."
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden. User does not have permission to perform this action."
+     *      )
+     * )
+     */
+    public function getInfoUser(Request $request)
+    {
         global $user_info;
         $id = $user_info->id;
         $data = $this->freelancerService->getById($id);
         return $this->sendOkResponse($data);
     }
+    /**
+     * @OA\Post(
+     *      path="/api/freelancer/info/update",
+     *      operationId="updateFreelancerInfo",
+     *      tags={"Freelancer"},
+     *      summary="Update freelancer's information",
+     *      description="Update freelancer's information.",
+     *      @OA\RequestBody(
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation. Returns the updated freelancer information.",
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized."
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden. User does not have permission to perform this action."
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity. Validation error."
+     *      )
+     * )
+     */
     public function updateForFreelancer(Request $request)
     {
         global $user_info;
@@ -109,47 +160,95 @@ class FreelancerController extends Controller
         if ($request->hasFile('avatar')) {
             $imagePath = FileHelper::saveImage($request->file('avatar'), 'client', 'avatar');
         }
-        $skill=$request->skill?explode(',', $request->skill):null;
-        $majors=$request->majors;
-        $validator=[];
-        if($imagePath!=null)
-            $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath,'skill'=>$skill]), $rules, $messages);
+        $skill = $request->skill ? explode(',', $request->skill) : null;
+        $majors = $request->majors;
+        $validator = [];
+        if ($imagePath != null)
+            $validator = Validator::make(array_merge($rq, ['avatar_url' => $imagePath, 'skill' => $skill]), $rules, $messages);
         else
-            $validator = Validator::make(array_merge($rq, ['skill'=>$skill]), $rules, $messages);
+            $validator = Validator::make(array_merge($rq, ['skill' => $skill]), $rules, $messages);
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
         $validator = $validator->validated();
-        $data=$this->freelancerService->updateAtribute($id,array_merge($validator,['avatar_url' => $imagePath,'skill'=>$skill,'majors'=>$majors]));
-        return $this->sendOkResponse($data);    
-
+        $data = $this->freelancerService->updateAtribute($id, array_merge($validator, ['avatar_url' => $imagePath, 'skill' => $skill, 'majors' => $majors]));
+        return $this->sendOkResponse($data);
     }
-
-    public function AddJob($id, Request $request){
+    /**
+     * @OA\Post(
+     *      path="/api/freelancer/mylist/{id}",
+     *      operationId="addJobToList",
+     *      tags={"Freelancer"},
+     *      summary="Add job to freelancer's list",
+     *      description="Add a job to freelancer's list.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID of the job to add to the list",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int64"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation. Returns success message.",
+     *          @OA\JsonContent(
+     *              type="string",
+     *              example="Đã thêm thành công vào list của bạn."
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized."
+     *      )
+     * )
+     */
+    public function AddJob($id, Request $request)
+    {
         global $user_info;
         $mid = $user_info->id;
-        $userType=$user_info->user_type;
-        $arrayInsert=['type_user'=>$userType,'user_id'=>$mid];
-        if($userType=='freelancer'){
-            $arrayInsert=array_merge($arrayInsert,['job_id'=>$id]);
-        }else{
-            $arrayInsert=array_merge($arrayInsert,['freelancer'=>$id]);
+        $userType = $user_info->user_type;
+        $arrayInsert = ['type_user' => $userType, 'user_id' => $mid];
+        if ($userType == 'freelancer') {
+            $arrayInsert = array_merge($arrayInsert, ['job_id' => $id]);
+        } else {
+            $arrayInsert = array_merge($arrayInsert, ['freelancer' => $id]);
         }
-        $iExist=MyList::where($arrayInsert)->get()->toArray();
-        if(count($iExist)>0){
+        $iExist = MyList::where($arrayInsert)->get()->toArray();
+        if (count($iExist) > 0) {
             MyList::where($arrayInsert)->delete();
-            return $this->sendOkResponse('Đã xóa thành công khỏi list của bạn.'); 
+            return $this->sendOkResponse('Đã xóa thành công khỏi list của bạn.');
         }
-        $data=MyList::create($arrayInsert);
-        return $this->sendOkResponse('Đã thêm thành công vào list của bạn.'); 
+        $data = MyList::create($arrayInsert);
+        return $this->sendOkResponse('Đã thêm thành công vào list của bạn.');
     }
-
-    public function GetMyJob(){
+    /**
+     * @OA\Get(
+     *      path="/api/freelancer/mylist",
+     *      operationId="getFreelancerJobList",
+     *      tags={"Freelancer"},
+     *      summary="Get freelancer's job list",
+     *      description="Get the list of jobs associated with the freelancer.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation. Returns the list of jobs.",
+     *       
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized."
+     *      )
+     * )
+     */
+    public function GetMyJob()
+    {
         global $user_info;
         $mid = $user_info->id;
-        $userType=$user_info->user_type;
-        $arrayInsert=['type_user'=>$userType,'user_id'=>$mid];
-        $iExist=MyList::where($arrayInsert)->get()->toArray();
+        $userType = $user_info->user_type;
+        $arrayInsert = ['type_user' => $userType, 'user_id' => $mid];
+        $iExist = MyList::where($arrayInsert)->get()->toArray();
         return $this->sendOkResponse($iExist);
     }
 }

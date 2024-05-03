@@ -50,7 +50,7 @@ return new class extends Migration
             $table->integer('sex')->nullable();
             $table->timestamp('date_of_birth')->nullable();
             $table->string('company_name')->nullable();
-            $table->string('introduce')->nullable();
+            $table->text('introduce')->nullable();
             $table->string('avatar_url')->nullable();
             $table->string('citizen_identification_url')->nullable();
             $table->string('citizen_identification_id')->nullable();
@@ -75,7 +75,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('position')->nullable();
             $table->integer('sex')->nullable();
-            $table->string('intro')->nullable();
+            $table->text('intro')->nullable();
             $table->string('avatar_url')->nullable();
             $table->integer('status')->default(1);
             $table->string('citizen_identification_url')->nullable();
@@ -106,7 +106,7 @@ return new class extends Migration
             $table->unsignedBigInteger('client_id');
             $table->string('title');
             $table->string('desc');
-            $table->string('content');
+            $table->text('content');
             $table->string('content_file');
             $table->string('thumbnail');
             $table->float('bids');
@@ -203,6 +203,7 @@ return new class extends Migration
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('freelancer_id');
             $table->string('content');
+            $table->string('content_file');
             $table->string('results');
             $table->integer('status');
             $table->timestamps();
@@ -227,13 +228,14 @@ return new class extends Migration
         
         Schema::create('feedbacks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('client_id');
+            $table->integer('user_id');
+            $table->string('type_user');
             $table->integer('rate');
             $table->text('comment');
             $table->integer('status');
             $table->timestamps();
              // Ràng buộc khóa ngoại tới bảng skills
-             $table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
+            // $table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
         });
         Schema::create('my_list', function (Blueprint $table) {
             $table->id();

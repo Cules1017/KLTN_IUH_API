@@ -18,6 +18,7 @@ use App\Services\JobService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use L5Swagger\L5SwaggerFacade;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,9 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
             Route::get('/google-callback', 'AuthController@handleGoogleCallback');
         }
     );
+    Route::get('/documentation', function () {
+        return L5SwaggerFacade::getApiDocumentation();
+    });
     Route::get('/linkstorage', function () {
         dd(public_path('../'));
     });

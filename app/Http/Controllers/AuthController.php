@@ -23,6 +23,26 @@ use GuzzleHttp\Client as ClientApi;
 use App\Helpers\FileHelper;
 use Illuminate\Support\Facades\Session;
 
+/**
+ * @OA\Info(
+ *     title="API IT WORKS",
+ *     version="1.0.0",
+ *     description="Tài liệu API cho hệ thống ứng dụng IT WORKS",
+ * @OA\SecurityScheme(
+
+* type="http",
+
+* securityScheme="bearerAuth",
+
+* scheme="bearer",
+
+* bearerFormat="JWT"
+*),
+ *     @OA\Contact(
+ *         email="your-email@example.com"
+ *     )
+ * )
+ */
 class AuthController extends Controller
 {
     /**
@@ -40,6 +60,28 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+ * @OA\Post(
+ *     path="/api/v1/login",
+ *     tags={"Authentication"},
+ *     summary="User login",
+ *     description="Authenticate user and generate access token",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"userName", "password"},
+ *             @OA\Property(property="userName", type="string",default="huyentran"),
+ *             @OA\Property(property="password", type="string", format="password",default="abc123")
+ *         ),
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *         )
+ *     )
+ * )
+ */
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -98,6 +140,29 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+ * @OA\Post(
+ *     path="/api/v1/register",
+ *     tags={"Authentication"},
+ *     summary="Register a User",
+ *     description="Register a new user",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"userName", "email", "password", "typeUser"},
+ *             @OA\Property(property="userName", type="string"),
+ *             @OA\Property(property="email", type="string", format="email"),
+ *             @OA\Property(property="password", type="string", format="password"),
+ *             @OA\Property(property="typeUser", type="string", enum={"freelancer", "admin", "client"})
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent()
+ *     )
+ * )
+ */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -274,7 +339,29 @@ class AuthController extends Controller
             'user' => $userInfo,
         ]);
     }
-
+/**
+ * @OA\Post(
+ *     path="/api/v1/change-password",
+ *     tags={"Authentication"},
+ *     summary="Change user's password",
+ *     description="Change the password of the authenticated user",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"old_password", "new_password", "new_password_confirmation"},
+ *             @OA\Property(property="old_password", type="string", format="password"),
+ *             @OA\Property(property="new_password", type="string", format="password"),
+ *             @OA\Property(property="new_password_confirmation", type="string", format="password")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent()
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function changePassWord(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -295,7 +382,18 @@ class AuthController extends Controller
             'user' => $user,
         ], 'User successfully changed password');
     }
-
+/**
+ * @OA\Post(
+ *     path="/api/v1/google-redirect",
+ *     tags={"Authentication"},
+ *     summary="Redirect to Google OAuth",
+ *     description="Redirect the user to Google OAuth flow",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation"
+ *     )
+ * )
+ */
     public function handleGoogleCallback()
 
     {
@@ -344,7 +442,20 @@ class AuthController extends Controller
             return redirect(env('FRONTEND_URL') . 'login');
         }
     }
-
+/**
+ * @OA\Post(
+ *     path="/api/v1/user-profile",
+ *     tags={"Authentication"},
+ *     summary="Get user profile",
+ *     description="Get the profile of the authenticated user",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent()
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function getInfoUserById(Request $request){
         $rq = MyHelper::convertKeysToSnakeCase($request->all());
         $validator = Validator::make($rq, [
@@ -376,7 +487,26 @@ class AuthController extends Controller
         if($dataResult==null) return $this->sendBadRequestResponse('không tìm thấy thông tin user');
         return $this->sendOkResponse($dataResult);
     }
-
+    /**
+     * @OA\Post(
+        *     path="/api/v1/send-otp",
+        *     tags={"Authentication"},
+        *     summary=" Send Otp",
+        *     description="gởi otp",
+        *     @OA\RequestBody(
+        *         required=true,
+        *         @OA\JsonContent(
+        *             ),
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Successful operation",
+        *         @OA\JsonContent(
+        *         )
+        *     ),
+        * security={{ "bearerAuth": {} }}
+        * )
+        */
     public function sendOtp(){
         global $user_info;
         $otp = "";
@@ -392,6 +522,27 @@ class AuthController extends Controller
         event(new OtpEvent($otp,strtotime('+3 minutes', time()),$user_info->id,$user_info->user_type));
         return $this->sendOkResponse([],'Đã gởi mã xác thực qua email!');
     }
+    /**
+ * @OA\Post(
+ *     path="/api/v1/verify-otp",
+ *     tags={"Authentication"},
+ *     summary="Verify OTP",
+ *     description="Verify the one-time password (OTP) sent via email",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"otp"},
+ *             @OA\Property(property="otp", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent()
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function verifyOtp(Request $request){
         global $user_info;
         $otp = $request->input('otp');
@@ -411,7 +562,35 @@ class AuthController extends Controller
         return $this->sendOkResponse([],'Đã gởi mã xác thực qua email!');
     }
 
-
+/**
+ * @OA\Post(
+ *     path="/api/v1/citizen-identification-card-verify",
+ *     tags={"Authentication"},
+ *     summary="Verify citizen identification card",
+ *     description="Verify the citizen identification card of the authenticated user",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"image"},
+ *                 @OA\Property(
+ *                     property="image",
+ *                     description="Image of the citizen identification card",
+ *                     type="string",
+ *                     format="binary"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent()
+ *     ),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
     public function CitizenIdentificationCardVerify(Request $request){
         global $user_info;
         $user_id = $user_info->id;
@@ -448,7 +627,7 @@ class AuthController extends Controller
                 "is_completed_profile"=>1,
             ];
         }catch(\Exception $e){
-             return $this->sendFailedResponse('Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.', -1, null, 400,'Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.');
+             return $this->sendOkResponse('Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.','Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.',-1);//('Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.', -1, null, 400,'Có Lỗi Khi Xác Thực Vui Lòng Kiểm Tra Lại Hình Ảnh CCCD Của Bạn.');
         }
         
 
