@@ -202,6 +202,7 @@ return new class extends Migration
             $table->enum('type_id',[1,2]);
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('freelancer_id');
+            $table->unsignedBigInteger('post_id');
             $table->string('content');
             $table->string('content_file');
             $table->string('results');
@@ -213,6 +214,7 @@ return new class extends Migration
 
             // Ràng buộc khóa ngoại tới bảng skills
             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
+            $table->foreign('fpost_id')->references('id')->on('jobs')->onDelete('cascade');
         });
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
