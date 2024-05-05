@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileHelper;
+use App\Models\Client;
+use App\Models\Freelancer;
+use App\Models\Job;
+use App\Models\Report;
 use App\Services\IAdminService;
 use App\Services\IReportService;
 use App\Services\ISystermConfigService;
@@ -59,6 +63,31 @@ class ReportController extends Controller
         return $this->sendOkResponse($data);
     }
 
+    public function createReport(Request $request){
+        $rules = [
+            'type_id' => ['required'], //1 client->freelancer,2 freelancer->client,3// report post,4 other report
+            'client_id'=>['nullable'],
+            'freelancer_id'=>['nullable'],
+            'post_id'=>['nullable'],
+            'content'=>['required'],
+        ];
+        // Custom error messages
+        $messages = [
+           
+        ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        }
+        $validator = $validator->validated();
+        $filePath = '';
+        if ($request->hasFile('content_file')) {
+            $filePath = FileHelper::saveImage($request->file('content_file'), 'report', 'avatar');
+        }
+        $data=Report::create(array_merge($validator,['content_file' => $filePath,'status'=>0,'results'=>'']));
+        return $this->sendOkResponse($data);
+    }
+
     public function adminUpdate($id, Request $request)
     {
         //case1 update lại khi qua đến client
@@ -67,9 +96,10 @@ class ReportController extends Controller
         //     return $this->sendFailedResponse("Không có quyền thao tác", -5, null, 403);
         // }
         // Validation rules
+
+        
         $rules = [
             'results'=>['required','string'],
-            'status' => ['required',Rule::in([0, 1])],
         ];
 
         // Custom error messages
@@ -80,8 +110,21 @@ class ReportController extends Controller
         if ($validator->fails()) {
             return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
         }
+        $infoReport=Report::find($id);
+        $resolve=$request->resolve;
+        if($resolve){
+            if($infoReport->type_id==1){
+                Freelancer::find($infoReport->freelancer_id)->update(['status'=>0]);
+            }
+            if($infoReport->type_id== 2){
+                Client::find($infoReport->client_id)->update(['status'=>0]);
+            }
+            if($infoReport->type_id==3){
+                Job::find($infoReport->post_id)->update(['status'=>0]);
+            }
+        }
         $validator = $validator->validated();
-        $data = $this->reportService->updateAtribute($id, $validator);
+        $data = $this->reportService->updateAtribute($id, ["status"=>1,'results'=>$request->results]);
 
         return $this->sendOkResponse($data);
     }

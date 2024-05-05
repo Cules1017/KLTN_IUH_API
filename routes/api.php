@@ -109,6 +109,12 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
                 }
             );
             Route::group(
+                ['prefix' => 'report',],
+                function () {
+                    Route::post('', [ReportController::class, 'createReport']);
+                }
+            );
+            Route::group(
                 ['prefix' => 'post', 'middleware' => ['isAdmin', 'exceptionGuest']],
                 function () {
                     Route::get('', [ReportController::class, 'index']);
