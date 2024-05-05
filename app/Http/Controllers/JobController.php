@@ -11,6 +11,7 @@ use App\Models\Job;
 use App\Models\Tasks;
 use App\Models\Invite;
 use App\Models\Comment;
+use App\Models\FeedBacks;
 use App\Models\Skill;
 use App\Services\IAdminService;
 use App\Services\IJobService;
@@ -633,4 +634,46 @@ class JobController extends Controller
         }
         return $this->sendOkResponse("ok");
     }
+
+    public function feedBack(Request $request){
+        global $user_info;
+        $rq = MyHelper::convertKeysToSnakeCase($request->all());
+        $rq['type_id']=1;//freelancer-feedback-client
+        if($user_info->user_type == 'client'){
+            $rq['type_id']=2;//client-feedback-freelancer 
+        }
+        // Validation rules
+        $rules = [
+            'job_id'=>['required','integer'],
+            'user_id'=>['required','integer'],
+            'type_id'=>['required','integer'],
+            'rate'=>['required'],
+            'comment'=>['string']
+        ];
+
+        // Custom error messages
+        $messages = [
+            'required' => 'Trường :attribute là bắt buộc.',
+            'exists' => 'Trường :attribute không tồn tại trong bảng :table.',
+            'string' => 'Trường :attribute phải là chuỗi.',
+            'max' => 'Trường :attribute không được vượt quá :max ký tự.',
+            'numeric' => 'Trường :attribute phải là số.',
+            'integer' => 'Trường :attribute phải là số nguyên.',
+            'min' => 'Trường :attribute phải lớn hơn hoặc bằng :min.',
+            'date' => 'Trường :attribute phải là ngày hợp lệ.',
+        ];
+        $validator = Validator::make($rq, $rules, $messages);
+        
+
+        if ($validator->fails()) {
+            return $this->sendFailedResponse($validator->errors(), -1, $validator->errors(), 422);
+        } 
+        $validator = $validator->validated();
+        $info= FeedBacks::where(['job_id' =>$validator['job_id'], 'job_type' =>$validator['job_type'],'user_id' =>$validator['user_id']])->get()->toArray();
+        if (count($info)>0) {
+            return $this->sendFailedResponse("Thất bại! Công việc này đã được đánh giá", -1, "Thất bại! Công việc này đã được đánh giá", 200);
+        } 
+        $data = FeedBacks::create($validator);
+        return $this->sendOkResponse($data);
+    } 
 }

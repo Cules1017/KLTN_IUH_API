@@ -211,6 +211,12 @@ Route::group(['prefix' => env('APP_VERSION', 'v1'), 'namespace' => 'App\Http\Con
         }
     );
     Route::group(
+        ['prefix' => 'feedback', 'middleware' => 'checktoken'], //
+        function () {
+            Route::post('', [JobController::class, 'feedBack']);
+        }
+    );
+    Route::group(
         ['prefix' => 'chat', 'middleware' => 'checktoken'], //
         function () {
             Route::post('new-chat', [ChatController::class, 'createNewRoomChat']);
