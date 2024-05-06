@@ -214,7 +214,7 @@ return new class extends Migration
 
             // Ràng buộc khóa ngoại tới bảng skills
             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
-            $table->foreign('fpost_id')->references('id')->on('jobs')->onDelete('cascade');
+            $table->foreign('post_id')->references('id')->on('jobs')->onDelete('cascade');
         });
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
