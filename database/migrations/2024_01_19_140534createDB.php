@@ -232,12 +232,14 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->string('type_user');
+            $table->unsignedBigInteger('job_id');
             $table->integer('rate');
             $table->text('comment');
             $table->integer('status');
             $table->timestamps();
              // Ràng buộc khóa ngoại tới bảng skills
-            // $table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
+            //$table->foreign('client_id')->references('id')->on('client')->onDelete('cascade');
+            $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
         });
         Schema::create('my_list', function (Blueprint $table) {
             $table->id();
@@ -248,6 +250,7 @@ return new class extends Migration
             $table->integer('status');
             $table->timestamps();
             $table->foreign('freelancer_id')->references('id')->on('freelancer')->onDelete('cascade');
+            $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
         });
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
